@@ -203,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // initialValue: _userProfileScreenStore.user.address,
       keyboardType: TextInputType.text,
       decoration: const InputDecoration(
-        labelText: 'Service Name',
+        labelText: 'Shop Name',
       ),
     );
   }

@@ -2,6 +2,7 @@ import 'package:car_service_providing_app/models/vehicle.dart';
 import 'package:car_service_providing_app/models/vehicle_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import '../../custom_utils/google_maps_helper.dart';
 import '../../resources/app_images.dart';
 import '../../custom_widgets/custom_wrappers.dart';
 import '../../service_locator.dart';
@@ -23,6 +24,9 @@ class HomeScreen extends StatelessWidget {
   //Stores
   final ManageServiceStore _manageServiceStore = getIt<ManageServiceStore>();
   final ProfileStore _profileStore = getIt<ProfileStore>();
+
+  //Utilities
+  final GoogleMapsHelper _googleMapsHelper = getIt<GoogleMapsHelper>();
 
   @override
   Widget build(BuildContext context) {
@@ -46,9 +50,13 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                // height: 200,
-                child: buildImage(theme, fullCarServiceImage),
+              Row(
+                children: [
+                  Expanded(
+                    // height: 200,
+                    child: buildImage(theme, fullCarServiceImage),
+                  ),
+                ],
               ),
               const SizedBox(height: 10),
               Padding(
@@ -65,7 +73,13 @@ class HomeScreen extends StatelessWidget {
                         const Expanded(child: SizedBox()),
                         // const Icon(Icons.favorite_border),
                         // const SizedBox(width: 10),
-                        const Icon(Icons.location_on_sharp),
+                        IconButton(
+                            onPressed: () async {
+                              await _googleMapsHelper.openMap(
+                                  _profileStore.shopLocation.latitude,
+                                  _profileStore.shopLocation.longitude);
+                            },
+                            icon: Icon(Icons.location_on_sharp)),
                         const SizedBox(width: 10),
                         const Icon(Icons.phone),
                       ],
@@ -109,11 +123,17 @@ class HomeScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     BookingStats(theme: theme),
                     const SizedBox(height: 20),
-                    _carWashServices(context, theme, screenWidth),
+                    Observer(builder: (_) {
+                      return _carWashServices(context, theme, screenWidth);
+                    }),
                     const SizedBox(height: 20),
-                    _workshopServices(context, theme, screenWidth),
+                    Observer(builder: (_) {
+                      return _workshopServices(context, theme, screenWidth);
+                    }),
                     const SizedBox(height: 20),
-                    _tyreServices(context, theme, screenWidth),
+                    Observer(builder: (_) {
+                      return _tyreServices(context, theme, screenWidth);
+                    }),
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -145,23 +165,31 @@ class HomeScreen extends StatelessWidget {
             style: theme.textTheme.headline3,
           ),
           const SizedBox(height: 20),
-          Wrap(
-            alignment: WrapAlignment.center,
-            children: _manageServiceStore.vehicleServiceList
-                .where((element) =>
-                    (element.serviceType == ServiceType.tyreChange ||
-                        element.serviceType == ServiceType.tyreRepair))
-                .map((element) => customImageBox(
-                      screenWidth * 0.4,
-                      theme,
-                      image: element.coverImage,
-                      title: element.shopName,
-                      price: element.cost,
-                      onTap: () {
-                        // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
-                      },
-                    ))
-                .toList(),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.spaceAround,
+                  runSpacing: 20,
+                  children: _manageServiceStore.vehicleServiceList
+                      .where((element) =>
+                          (element.serviceType == ServiceType.tyreChange ||
+                              element.serviceType == ServiceType.tyreRepair))
+                      .map((element) => customImageBox(
+                            screenWidth * 0.4,
+                            theme,
+                            key: ValueKey(element.id),
+                            image: element.coverImage,
+                            title: element.serviceName,
+                            price: element.cost,
+                            onTap: () {
+                              // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
+                            },
+                          ))
+                      .toList(),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
         ],
@@ -179,25 +207,33 @@ class HomeScreen extends StatelessWidget {
             style: theme.textTheme.headline3,
           ),
           const SizedBox(height: 20),
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            children: _manageServiceStore.vehicleServiceList
-                .where((element) =>
-                    (element.serviceType == ServiceType.batteryIssue ||
-                        element.serviceType == ServiceType.oilChange ||
-                        element.serviceType == ServiceType.carService ||
-                        element.serviceType == ServiceType.breakService))
-                .map((element) => customImageBox(
-                      screenWidth * 0.4,
-                      theme,
-                      image: element.coverImage,
-                      title: element.shopName,
-                      price: element.cost,
-                      onTap: () {
-                        // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
-                      },
-                    ))
-                .toList(),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.spaceAround,
+                  runSpacing: 20,
+                  children: _manageServiceStore.vehicleServiceList
+                      .where((element) =>
+                          (element.serviceType == ServiceType.batteryIssue ||
+                              element.serviceType == ServiceType.oilChange ||
+                              element.serviceType == ServiceType.carService ||
+                              element.serviceType == ServiceType.breakService))
+                      .map((element) => customImageBox(
+                            screenWidth * 0.4,
+                            theme,
+                            key: ValueKey(element.id),
+                            image: element.coverImage,
+                            title: element.serviceName,
+                            price: element.cost,
+                            onTap: () {
+                              // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
+                            },
+                          ))
+                      .toList(),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
         ],
@@ -215,23 +251,31 @@ class HomeScreen extends StatelessWidget {
             style: theme.textTheme.headline3,
           ),
           const SizedBox(height: 20),
-          Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            children: _manageServiceStore.vehicleServiceList
-                .where((element) =>
-                    (element.serviceType == ServiceType.fullCarWash ||
-                        element.serviceType == ServiceType.halfCarWash))
-                .map((element) => customImageBox(
-                      screenWidth * 0.4,
-                      theme,
-                      image: element.coverImage,
-                      title: element.shopName,
-                      price: element.cost,
-                      onTap: () {
-                        // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
-                      },
-                    ))
-                .toList(),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  alignment: WrapAlignment.spaceAround,
+                  runSpacing: 20,
+                  children: _manageServiceStore.vehicleServiceList
+                      .where((element) =>
+                          (element.serviceType == ServiceType.fullCarWash ||
+                              element.serviceType == ServiceType.halfCarWash))
+                      .map((element) => customImageBox(
+                            screenWidth * 0.4,
+                            theme,
+                            key: ValueKey(element.id),
+                            image: element.coverImage,
+                            title: element.serviceName,
+                            price: element.cost,
+                            onTap: () {
+                              // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
+                            },
+                          ))
+                      .toList(),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
         ],

@@ -34,6 +34,7 @@ Widget customContainer(
 
 Widget customImageBox(double width, ThemeData _theme,
     {required String image,
+    Key? key,
     required String title,
     double? price,
     Function()? onTap}) {
@@ -41,6 +42,7 @@ Widget customImageBox(double width, ThemeData _theme,
   ImageType imageType = _customImageHelper.getImageType(image);
 
   return InkWell(
+    key: key,
     onTap: onTap,
     child: customContainer(
       child: Column(

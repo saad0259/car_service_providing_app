@@ -12,7 +12,7 @@ class GoogleMapsHelper {
   FunctionResponse showPlacePicker(BuildContext context,
       {LatLng? initialPosition}) {
     FunctionResponse fResponse = getIt<FunctionResponse>();
-    const apiKey = "AIzaSyBqbPKtyaIo4H85J5or0lCZ7Lyipc8nxSY";
+    const apiKey = "AIzaSyDGVdifKHexYzYZjIF615HPm5e00AzqO4g";
     LatLng init = initialPosition ?? LatLng(31.5116835, 74.3330131);
     Navigator.push(
       context,

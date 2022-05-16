@@ -16,24 +16,40 @@ import '../../service_locator.dart';
 import '../../stores/manage_service_store.dart';
 import '../../stores/profile_store.dart';
 
-class AddServiceScreen extends StatelessWidget {
+class AddServiceScreen extends StatefulWidget {
   AddServiceScreen({Key? key}) : super(key: key);
   static const routeName = '/add-service-screen';
+
+  @override
+  State<AddServiceScreen> createState() => _AddServiceScreenState();
+}
+
+class _AddServiceScreenState extends State<AddServiceScreen> {
   //Form
   final _formKey = GlobalKey<FormState>();
 
   //Custom Utilities
   final CustomValidator _customValidator = getIt<CustomValidator>();
+
   final CustomFormHelper _customFormHelper = getIt<CustomFormHelper>();
+
   final CustomAlerts _customAlerts = getIt<CustomAlerts>();
+
   final ConnectivityHelper _connectivityHelper = getIt<ConnectivityHelper>();
+
   final CustomImageHelper _customImageHelper = getIt<CustomImageHelper>();
 
   //Stores
   final ManageServiceStore _manageServiceStore = getIt<ManageServiceStore>();
+
   final ProfileStore _profileStore = getIt<ProfileStore>();
 
-  //Functions
+  @override
+  void initState() {
+    super.initState();
+    _manageServiceStore.changeCoverImage('');
+  }
+
   //Functions
   Future<void> changeCoverImage(BuildContext context) async {
     FunctionResponse fResponse = getIt<FunctionResponse>();
@@ -196,7 +212,7 @@ class AddServiceScreen extends StatelessWidget {
         if (val == null) {
           return;
         }
-        _manageServiceStore.changeDescription(val);
+        _manageServiceStore.changeCost(double.tryParse(val) ?? 0);
       },
       keyboardType: TextInputType.number,
       decoration: const InputDecoration(
