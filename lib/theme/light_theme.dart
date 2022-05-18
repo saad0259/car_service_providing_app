@@ -11,6 +11,7 @@ Color accentColor = _appColors.accentColorLight;
 Color primaryTextColor = _appColors.primaryTextColorLight;
 Color primaryTextColor2 = _appColors.primaryTextColor2Light;
 Color errorColor = _appColors.errorColorLight;
+Color inputFillColor = _appColors.inputFillColor;
 
 CustomButtonTheme _buttonTheme = CustomButtonTheme(
   primaryColor: primaryColor,
@@ -23,6 +24,7 @@ CustomInputTheme _inputTheme = CustomInputTheme(
   accentColor: accentColor,
   primaryTextColor: primaryTextColor,
   primaryTextColorLight: _appColors.primaryTextColorLight,
+  inputFillColor: _appColors.inputFillColor,
 );
 
 ThemeData lightTheme(BuildContext context) => ThemeData(

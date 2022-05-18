@@ -83,11 +83,11 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       fResponse = await _connectivityHelper.checkInternetConnection();
       if (fResponse.success) {
         fResponse = await _manageServiceStore.addNewService(
-            _profileStore.serviceShop.id,
-            _profileStore.serviceShop.name,
-            _profileStore.serviceShop.rating,
-            _profileStore.serviceShop.address,
-            _profileStore.serviceShop.shopLocation);
+            _profileStore.currentUser!.id,
+            _profileStore.currentUser!.name,
+            _profileStore.currentUser!.rating,
+            _profileStore.currentUser!.address,
+            _profileStore.currentUser!.shopLocation);
       }
       _customAlerts.popLoader(context);
     }
@@ -173,7 +173,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
   Widget serviceDescriptionField() {
     return TextFormField(
-      validator: _customValidator.validateNonNullableString,
+      validator: _customValidator.nonNullableString,
       onSaved: (String? val) {
         if (val == null) {
           return;
@@ -190,7 +190,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
   Widget serviceNameField() {
     return TextFormField(
-      validator: _customValidator.validateNonNullableString,
+      validator: _customValidator.nonNullableString,
       onSaved: (String? val) {
         if (val == null) {
           return;

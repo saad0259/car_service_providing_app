@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp> {
       onUnknownRoute: (settings) =>
           MaterialPageRoute(builder: (ctx) => HomeScreen()),
       routes: {
-        '/': (ctx) => HomeScreen(),
+        '/': (ctx) => LoginScreen(),
         LoginScreen.routeName: (ctx) => LoginScreen(),
         SignupScreen.routeName: (ctx) => SignupScreen(),
         HomeScreen.routeName: (ctx) => HomeScreen(),

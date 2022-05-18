@@ -34,20 +34,20 @@ abstract class _ManageServiceStore with Store {
   @observable
   ObservableList<VehicleService> vehicleServiceList =
       ObservableList<VehicleService>.of([
-    VehicleService(
-      id: '1234',
-      shopId: '123',
-      coverImage: fullCarServiceImage,
-      shopName: 'Abc',
-      serviceName: 'Car Service',
-      description: 'Hello Hi',
-      serviceType: ServiceType.carService,
-      vehicleType: VehicleType.bike,
-      rating: 4.1,
-      cost: 100,
-      address: 'some address ',
-      shopLocation: GoogleMapsHelper().defaultGoogleMapsLocation,
-    ),
+    // VehicleService(
+    //   id: '1234',
+    //   shopId: '123',
+    //   coverImage: fullCarServiceImage,
+    //   shopName: 'Abc',
+    //   serviceName: 'Car Service',
+    //   description: 'Hello Hi',
+    //   serviceType: ServiceType.carService,
+    //   vehicleType: VehicleType.bike,
+    //   rating: 4.1,
+    //   cost: 100,
+    //   address: 'some address ',
+    //   shopLocation: GoogleMapsHelper().defaultGoogleMapsLocation,
+    // ),
   ]);
   @action
   void changeSelectedVehicleType(String newVehicleType) {

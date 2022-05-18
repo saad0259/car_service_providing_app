@@ -193,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget shopNameField() {
     return TextFormField(
-      validator: _customValidator.validateNonNullableString,
+      validator: _customValidator.nonNullableString,
       onSaved: (String? val) {
         if (val == null) {
           return;

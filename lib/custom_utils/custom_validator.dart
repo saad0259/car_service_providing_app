@@ -10,7 +10,7 @@ class CustomValidator {
     return null;
   }
 
-  String? validateNonNullableString(String? value) {
+  String? nonNullableString(String? value) {
     if (value == null || value.isEmpty) {
       return 'This field is required';
     }

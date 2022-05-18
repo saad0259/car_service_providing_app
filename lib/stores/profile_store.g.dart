@@ -57,6 +57,22 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
+  late final _$currentUserAtom =
+      Atom(name: '_ProfileStore.currentUser', context: context);
+
+  @override
+  ServiceShop? get currentUser {
+    _$currentUserAtom.reportRead();
+    return super.currentUser;
+  }
+
+  @override
+  set currentUser(ServiceShop? value) {
+    _$currentUserAtom.reportWrite(value, super.currentUser, () {
+      super.currentUser = value;
+    });
+  }
+
   late final _$serviceShopAtom =
       Atom(name: '_ProfileStore.serviceShop', context: context);
 
@@ -75,6 +91,17 @@ mixin _$ProfileStore on _ProfileStore, Store {
 
   late final _$_ProfileStoreActionController =
       ActionController(name: '_ProfileStore', context: context);
+
+  @override
+  void getUser() {
+    final _$actionInfo = _$_ProfileStoreActionController.startAction(
+        name: '_ProfileStore.getUser');
+    try {
+      return super.getUser();
+    } finally {
+      _$_ProfileStoreActionController.endAction(_$actionInfo);
+    }
+  }
 
   @override
   void changeShopCoverImage(String image) {
@@ -126,6 +153,7 @@ mixin _$ProfileStore on _ProfileStore, Store {
 shopCoverImage: ${shopCoverImage},
 shopLocation: ${shopLocation},
 shopAddress: ${shopAddress},
+currentUser: ${currentUser},
 serviceShop: ${serviceShop}
     ''';
   }

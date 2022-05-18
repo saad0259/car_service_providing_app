@@ -7,6 +7,7 @@ import '../custom_utils/google_maps_helper.dart';
 import '../models/service_shop.dart';
 import '../resources/app_images.dart';
 import '../service_locator.dart';
+import 'auth_store.dart';
 import 'manage_service_store.dart';
 
 part 'profile_store.g.dart';
@@ -14,8 +15,9 @@ part 'profile_store.g.dart';
 class ProfileStore = _ProfileStore with _$ProfileStore;
 
 abstract class _ProfileStore with Store {
-  _ProfileStore(this._manageServiceStore);
+  _ProfileStore(this._manageServiceStore, this._authStore);
   final ManageServiceStore _manageServiceStore;
+  final AuthStore _authStore;
 
   @observable
   String shopCoverImage = '';
@@ -23,11 +25,15 @@ abstract class _ProfileStore with Store {
   LatLng shopLocation = GoogleMapsHelper().defaultGoogleMapsLocation;
   @observable
   String shopAddress = '';
+  @observable
+  ServiceShop? currentUser;
 
   @observable
   ServiceShop serviceShop = ServiceShop(
     id: '123',
     name: 'Pseudo Name',
+    email: 'abc@gmail.com',
+    password: '12345678',
     address: 'some address',
     openingTime: TimeOfDay.now(),
     closingTime: TimeOfDay.now(),
@@ -35,6 +41,12 @@ abstract class _ProfileStore with Store {
     rating: 3,
     shopLocation: GoogleMapsHelper().defaultGoogleMapsLocation,
   );
+
+  @action
+  void getUser() {
+    currentUser = _authStore.currentUser;
+    print('name : ${currentUser?.name}');
+  }
 
   @action
   void changeShopCoverImage(String image) {
@@ -58,6 +70,8 @@ abstract class _ProfileStore with Store {
       serviceShop = ServiceShop(
         id: serviceShop.id,
         name: name,
+        email: serviceShop.email,
+        password: serviceShop.password,
         address: serviceShop.address,
         openingTime: serviceShop.openingTime,
         closingTime: serviceShop.closingTime,

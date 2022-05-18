@@ -10,6 +10,7 @@ import 'custom_utils/custom_alerts.dart';
 import 'custom_utils/custom_validator.dart';
 import 'custom_utils/custom_form_helper.dart';
 import 'custom_utils/image_helper.dart';
+import 'stores/auth_store.dart';
 import 'stores/home_screen_store.dart';
 import 'stores/manage_service_store.dart';
 import 'stores/profile_store.dart';
@@ -40,9 +41,11 @@ Future<void> setupLocator() async {
 
   //Stores
   // getIt.registerSingleton(HomeScreenStore());
+  getIt.registerSingleton(AuthStore());
   getIt.registerSingleton(ManageServiceStore());
   getIt.registerSingleton(ProfileStore(
     ManageServiceStore(),
+    AuthStore(),
   ));
   getIt.registerSingleton(ServiceRequestStore());
 }
