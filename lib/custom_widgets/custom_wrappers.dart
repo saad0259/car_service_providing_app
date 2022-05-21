@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../theme/my_app_colors.dart';
 import '../../service_locator.dart';
@@ -96,28 +96,12 @@ Widget buildImage(ThemeData theme, String imagePath) {
   final Widget returnAble = imagePath.isEmpty
       ? const SizedBox()
       : (imageType == ImageType.network
-          ? Image.network(
-              imagePath,
+          ? CachedNetworkImage(
+              imageUrl: imagePath,
               fit: BoxFit.cover,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
-              },
-              errorBuilder: (BuildContext context, Object exception,
-                  StackTrace? stackTrace) {
-                return Icon(
-                  Icons.error,
-                  color: theme.colorScheme.error,
-                );
-              },
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  CircularProgressIndicator(value: downloadProgress.progress),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
             )
           : (imageType == ImageType.file
               ? Image.file(

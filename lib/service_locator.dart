@@ -40,12 +40,15 @@ Future<void> setupLocator() async {
   // );
 
   //Stores
-  // getIt.registerSingleton(HomeScreenStore());
-  getIt.registerSingleton(AuthStore());
+  getIt.registerSingleton(AuthStore(CustomImageHelper()));
   getIt.registerSingleton(ManageServiceStore());
   getIt.registerSingleton(ProfileStore(
     ManageServiceStore(),
-    AuthStore(),
+    AuthStore(CustomImageHelper()),
   ));
   getIt.registerSingleton(ServiceRequestStore());
+  getIt.registerSingleton(HomeScreenStore(ProfileStore(
+    ManageServiceStore(),
+    AuthStore(CustomImageHelper()),
+  )));
 }

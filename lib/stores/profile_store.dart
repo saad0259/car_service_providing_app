@@ -1,7 +1,12 @@
+import 'dart:convert';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobx/mobx.dart';
 
+import '../constants/firebase_constants.dart';
 import '../custom_utils/function_response.dart';
 import '../custom_utils/google_maps_helper.dart';
 import '../models/service_shop.dart';
@@ -45,8 +50,51 @@ abstract class _ProfileStore with Store {
 
   @action
   void getUser() {
-    currentUser = _authStore.currentUser;
+    // currentUser = _authStore.currentUser;
     print('name : ${currentUser?.name}');
+  }
+
+  @action
+  Future<FunctionResponse> loadProfile() async {
+    FunctionResponse fResponse = getIt<FunctionResponse>();
+    try {
+      var data;
+      final User? user = firebaseAuth.currentUser;
+      if (user != null) {
+        DocumentSnapshot doc = await firestoreShops.doc(user.uid).get();
+        if (doc.exists) {
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+          print(' Data from FireBase ${data.toString()}');
+          LatLng shopLocation = GoogleMapsHelper().defaultGoogleMapsLocation;
+          if (data['shopLocation'] == null) {
+            final GeoPoint dbLocation = data['shopLocation'] as GeoPoint;
+            shopLocation = LatLng(dbLocation.latitude, dbLocation.longitude);
+          }
+          print('after getting location');
+          currentUser = ServiceShop(
+            id: user.uid,
+            name: data['name'],
+            email: data['email'],
+            password: data['password'],
+            address: data['address'],
+            phone: data['phone'],
+            openingTime: data['openingTime'] ?? TimeOfDay.now(),
+            closingTime: data['closingTime'] ?? TimeOfDay.now(),
+            coverImage: data['coverImage'] ?? '',
+            rating: data['rating'] ?? 0,
+            shopLocation: shopLocation,
+          );
+          fResponse.passed(message: 'Profile Loaded from database');
+        }
+      } else {
+        fResponse.failed(message: 'Current user not found');
+      }
+    } catch (e) {
+      fResponse.failed(message: 'Error loading profile : $e');
+    }
+
+    return fResponse;
   }
 
   @action

@@ -1,8 +1,10 @@
-import 'package:car_service_providing_app/models/vehicle.dart';
 import 'package:car_service_providing_app/models/vehicle_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../custom_utils/connectivity_helper.dart';
+import '../../custom_utils/custom_alerts.dart';
+import '../../custom_utils/function_response.dart';
 import '../../custom_utils/google_maps_helper.dart';
 import '../../resources/app_images.dart';
 import '../../custom_widgets/custom_wrappers.dart';
@@ -14,6 +16,7 @@ import '../auth/login_screen.dart';
 import '../manage_services/add_service_screen.dart';
 import '../service_requests/service_request_list_screen.dart';
 import '../shop_profile/profile_screen.dart';
+import '../../constants/firebase_constants.dart' as fb;
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
@@ -31,17 +34,46 @@ class _HomeScreenState extends State<HomeScreen> {
 
   //Stores
   final ManageServiceStore _manageServiceStore = getIt<ManageServiceStore>();
-
   final ProfileStore _profileStore = getIt<ProfileStore>();
+  final HomeScreenStore _homeScreenStore = getIt<HomeScreenStore>();
 
   //Utilities
   final GoogleMapsHelper _googleMapsHelper = getIt<GoogleMapsHelper>();
+  final CustomAlerts _customAlerts = getIt<CustomAlerts>();
+  final ConnectivityHelper _connectivityHelper = getIt<ConnectivityHelper>();
 
   @override
   void initState() {
-    _profileStore.getUser();
+    _homeScreenStore.loadAllData();
 
     super.initState();
+  }
+
+  //Form
+  Future<void> tryLogout(BuildContext context) async {
+    FunctionResponse fResponse = getIt<FunctionResponse>();
+
+    try {
+      _customAlerts.showLoaderDialog(context);
+      fResponse = await _connectivityHelper.checkInternetConnection();
+      if (fResponse.success) {
+        await fb.firebaseAuth.signOut();
+        fResponse.passed(message: 'Sign Out Successful');
+      }
+    } catch (e) {
+      fResponse.failed(message: 'Error Logging Out');
+    }
+
+    _customAlerts.popLoader(context);
+
+    fResponse.printResponse();
+    //show snackbar
+    _customAlerts.showSnackBar(context, fResponse.message,
+        success: fResponse.success);
+    if (fResponse.success) {
+      //Go to Login
+      Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
+    }
   }
 
   @override
@@ -52,134 +84,152 @@ class _HomeScreenState extends State<HomeScreen> {
     final double screenWidth = MediaQuery.of(context).size.width;
 
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          actions: [
-            IconButton(
-                onPressed: () =>
-                    Navigator.of(context).pushNamed(ProfileScreen.routeName),
-                icon: const Icon(Icons.edit)),
-            IconButton(
-                onPressed: () => Navigator.of(context)
-                    .pushReplacementNamed(LoginScreen.routeName),
-                icon: const Icon(Icons.logout)),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    // height: 200,
-                    child: buildImage(
-                        theme,
-                        _profileStore.currentUser?.coverImage ??
-                            halfCarWashServiceImage),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.all(18.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          _profileStore.currentUser?.name ??
-                              'Service Shop Name',
-                          style: theme.textTheme.headline3,
-                        ),
-                        const Expanded(child: SizedBox()),
-                        // const Icon(Icons.favorite_border),
-                        // const SizedBox(width: 10),
-                        IconButton(
-                            onPressed: () async {
-                              await _googleMapsHelper.openMap(
-                                  _profileStore.shopLocation.latitude,
-                                  _profileStore.shopLocation.longitude);
-                            },
-                            icon: const Icon(Icons.location_on_sharp)),
-                        const SizedBox(width: 10),
-                        IconButton(
-                            onPressed: () {
-                              launchUrl(Uri.parse(
-                                  "tel://${_profileStore.currentUser?.phone ?? '+9230123456789'}"));
-                            },
-                            icon: const Icon(Icons.phone)),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Text(
-                              '11th downing street, emblem avenue, south park, london',
-                              softWrap: true,
-                              style: theme.textTheme.headline6,
+      child: Observer(builder: (_) {
+        return _homeScreenStore.isLoadingHomeScreenData
+            ? const Scaffold(
+                body: Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+              )
+            : Scaffold(
+                appBar: AppBar(
+                  title: Text(_homeScreenStore.currentUser.name),
+                  actions: [
+                    IconButton(
+                        onPressed: () => Navigator.of(context)
+                            .pushNamed(ProfileScreen.routeName),
+                        icon: const Icon(Icons.edit)),
+                    IconButton(
+                        onPressed: () async {
+                          await tryLogout(context);
+                        },
+                        icon: const Icon(Icons.logout)),
+                  ],
+                ),
+                body: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            // height: 200,
+                            child: SizedBox(
+                              height: screenWidth * 0.65,
+                              child: buildImage(theme,
+                                  _homeScreenStore.currentUser.coverImage),
                             ),
                           ),
-                        ),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(1.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.all(18.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
                                 Text(
-                                  rating.toString(),
-                                  style: theme.textTheme.headline6,
+                                  _homeScreenStore.currentUser.name,
+                                  style: theme.textTheme.headline3,
                                 ),
-                                const SizedBox(width: 10.0),
-                                const Icon(Icons.star),
-                                const SizedBox(width: 10.0),
-                                Text(
-                                  '($reviewsCount Reviews)',
-                                  style: theme.textTheme.headline6,
+                                const Expanded(child: SizedBox()),
+                                IconButton(
+                                    tooltip:
+                                        '${_homeScreenStore.currentUser.shopLocation.latitude.toStringAsFixed(3)}, ${_homeScreenStore.currentUser.shopLocation.longitude.toStringAsFixed(3)}',
+                                    onPressed: () async {
+                                      await _googleMapsHelper.openMap(
+                                          _homeScreenStore.currentUser
+                                              .shopLocation.latitude,
+                                          _homeScreenStore.currentUser
+                                              .shopLocation.longitude);
+                                    },
+                                    icon: const Icon(Icons.location_on_sharp)),
+                                const SizedBox(width: 10),
+                                IconButton(
+                                    tooltip:
+                                        '+92${_homeScreenStore.currentUser.phone}',
+                                    onPressed: () {
+                                      launchUrl(Uri.parse(
+                                          "tel://+92${_homeScreenStore.currentUser.phone}"));
+                                    },
+                                    icon: const Icon(Icons.phone)),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Text(
+                                      _homeScreenStore.currentUser.address,
+                                      softWrap: true,
+                                      style: theme.textTheme.headline6,
+                                    ),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          _homeScreenStore.currentUser.rating
+                                              .toString(),
+                                          style: theme.textTheme.headline6,
+                                        ),
+                                        const SizedBox(width: 10.0),
+                                        const Icon(Icons.star),
+                                        const SizedBox(width: 10.0),
+                                        Text(
+                                          '($reviewsCount Reviews)',
+                                          style: theme.textTheme.headline6,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
+                            const SizedBox(height: 20),
+                            BookingStats(theme: theme),
+                            const SizedBox(height: 20),
+                            Observer(builder: (_) {
+                              return _carWashServices(
+                                  context, theme, screenWidth);
+                            }),
+                            const SizedBox(height: 20),
+                            Observer(builder: (_) {
+                              return _workshopServices(
+                                  context, theme, screenWidth);
+                            }),
+                            const SizedBox(height: 20),
+                            Observer(builder: (_) {
+                              return _tyreServices(context, theme, screenWidth);
+                            }),
+                            const SizedBox(height: 20),
+                          ],
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    BookingStats(theme: theme),
-                    const SizedBox(height: 20),
-                    Observer(builder: (_) {
-                      return _carWashServices(context, theme, screenWidth);
-                    }),
-                    const SizedBox(height: 20),
-                    Observer(builder: (_) {
-                      return _workshopServices(context, theme, screenWidth);
-                    }),
-                    const SizedBox(height: 20),
-                    Observer(builder: (_) {
-                      return _tyreServices(context, theme, screenWidth);
-                    }),
-                    const SizedBox(height: 20),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(AddServiceScreen.routeName),
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.secondary,
-          label: const Text('Add Service'),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-        ),
-      ),
+                floatingActionButton: FloatingActionButton.extended(
+                  onPressed: () => Navigator.of(context)
+                      .pushNamed(AddServiceScreen.routeName),
+                  backgroundColor: theme.colorScheme.primary,
+                  foregroundColor: theme.colorScheme.secondary,
+                  label: const Text('Add Service'),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+              );
+      }),
     );
   }
 

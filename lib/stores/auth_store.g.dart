@@ -25,38 +25,6 @@ mixin _$AuthStore on _AuthStore, Store {
     });
   }
 
-  late final _$currentUserAtom =
-      Atom(name: '_AuthStore.currentUser', context: context);
-
-  @override
-  ServiceShop? get currentUser {
-    _$currentUserAtom.reportRead();
-    return super.currentUser;
-  }
-
-  @override
-  set currentUser(ServiceShop? value) {
-    _$currentUserAtom.reportWrite(value, super.currentUser, () {
-      super.currentUser = value;
-    });
-  }
-
-  late final _$serviceShopeListAtom =
-      Atom(name: '_AuthStore.serviceShopeList', context: context);
-
-  @override
-  ObservableList<ServiceShop> get serviceShopeList {
-    _$serviceShopeListAtom.reportRead();
-    return super.serviceShopeList;
-  }
-
-  @override
-  set serviceShopeList(ObservableList<ServiceShop> value) {
-    _$serviceShopeListAtom.reportWrite(value, super.serviceShopeList, () {
-      super.serviceShopeList = value;
-    });
-  }
-
   late final _$_AuthStoreActionController =
       ActionController(name: '_AuthStore', context: context);
 
@@ -127,11 +95,20 @@ mixin _$AuthStore on _AuthStore, Store {
   }
 
   @override
+  void updateAddress(String newAddress) {
+    final _$actionInfo = _$_AuthStoreActionController.startAction(
+        name: '_AuthStore.updateAddress');
+    try {
+      return super.updateAddress(newAddress);
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
-newServiceShop: ${newServiceShop},
-currentUser: ${currentUser},
-serviceShopeList: ${serviceShopeList}
+newServiceShop: ${newServiceShop}
     ''';
   }
 }

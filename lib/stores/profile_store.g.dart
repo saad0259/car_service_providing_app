@@ -89,6 +89,14 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
+  late final _$loadProfileAsyncAction =
+      AsyncAction('_ProfileStore.loadProfile', context: context);
+
+  @override
+  Future<FunctionResponse> loadProfile() {
+    return _$loadProfileAsyncAction.run(() => super.loadProfile());
+  }
+
   late final _$_ProfileStoreActionController =
       ActionController(name: '_ProfileStore', context: context);
 

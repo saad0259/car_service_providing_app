@@ -96,7 +96,7 @@ class SignupScreen extends StatelessWidget {
       _customAlerts.showLoaderDialog(context);
       fResponse = await _connectivityHelper.checkInternetConnection();
       if (fResponse.success) {
-        fResponse = _authStore.trySignup();
+        fResponse = await _authStore.trySignup();
       }
       _customAlerts.popLoader(context);
     }
@@ -214,7 +214,7 @@ class SignupScreen extends StatelessWidget {
                                   const SizedBox(height: 20),
                                   TextFormField(
                                     validator:
-                                        _customValidator.validateAlphaNmeric,
+                                        _customValidator.nonNullableString,
                                     onSaved: (String? val) {
                                       if (val == null) {
                                         return;
@@ -252,7 +252,6 @@ class SignupScreen extends StatelessWidget {
                                       }
                                       _authStore.updatePassword(val);
                                     },
-                                    maxLength: 10,
                                     obscureText: true,
                                     keyboardType: TextInputType.text,
                                     decoration: const InputDecoration(
@@ -267,11 +266,28 @@ class SignupScreen extends StatelessWidget {
                                       if (val == null) {
                                         return;
                                       }
-                                      _authStore.updatePassword(val);
+                                      _authStore.updatePhone(val);
+                                    },
+                                    maxLength: 10,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      label: Text('3012345678'),
+                                      prefixIcon: Icon(Icons.lock),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  TextFormField(
+                                    validator:
+                                        _customValidator.nonNullableString,
+                                    onSaved: (String? val) {
+                                      if (val == null) {
+                                        return;
+                                      }
+                                      _authStore.updateAddress(val);
                                     },
                                     keyboardType: TextInputType.text,
                                     decoration: const InputDecoration(
-                                      label: Text('+92'),
+                                      label: Text('Address'),
                                       prefixIcon: Icon(Icons.lock),
                                     ),
                                   ),
@@ -321,7 +337,7 @@ class SignupScreen extends StatelessWidget {
                                           onPressed: () {
                                             Navigator.of(context)
                                                 .pushReplacementNamed(
-                                                    SignupScreen.routeName);
+                                                    LoginScreen.routeName);
                                           },
                                           child: const Text('Login'),
                                           style: _theme
