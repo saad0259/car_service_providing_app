@@ -3,8 +3,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 //Firestore
 final firebaseFirestore = FirebaseFirestore.instance;
-final firestoreShops = FirebaseFirestore.instance.collection('shops');
+final firestoreShopsCollection = firebaseFirestore.collection('shops');
+final firestoreServicesCollection = firebaseFirestore.collection('services');
 //Firebase Storage
-const String serviceShopImages = 'service_shop_images/';
+const String serviceShopImagesDirectory = 'service_shop_images/';
 //Firebase Auth
 final firebaseAuth = FirebaseAuth.instance;

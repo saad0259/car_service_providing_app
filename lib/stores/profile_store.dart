@@ -20,8 +20,7 @@ part 'profile_store.g.dart';
 class ProfileStore = _ProfileStore with _$ProfileStore;
 
 abstract class _ProfileStore with Store {
-  _ProfileStore(this._manageServiceStore, this._authStore);
-  final ManageServiceStore _manageServiceStore;
+  _ProfileStore(this._authStore);
   final AuthStore _authStore;
 
   @observable
@@ -32,21 +31,6 @@ abstract class _ProfileStore with Store {
   String shopAddress = '';
   @observable
   ServiceShop? currentUser;
-
-  @observable
-  ServiceShop serviceShop = ServiceShop(
-    id: '123',
-    name: 'Pseudo Name',
-    email: 'abc@gmail.com',
-    password: '12345678',
-    address: 'some address',
-    phone: '30123456789',
-    openingTime: TimeOfDay.now(),
-    closingTime: TimeOfDay.now(),
-    coverImage: fullCarServiceImage,
-    rating: 3,
-    shopLocation: GoogleMapsHelper().defaultGoogleMapsLocation,
-  );
 
   @action
   void getUser() {
@@ -61,7 +45,8 @@ abstract class _ProfileStore with Store {
       var data;
       final User? user = firebaseAuth.currentUser;
       if (user != null) {
-        DocumentSnapshot doc = await firestoreShops.doc(user.uid).get();
+        DocumentSnapshot doc =
+            await firestoreShopsCollection.doc(user.uid).get();
         if (doc.exists) {
           Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
@@ -112,27 +97,27 @@ abstract class _ProfileStore with Store {
     shopAddress = address;
   }
 
-  @action
-  FunctionResponse updateProfile(String name) {
-    FunctionResponse fResponse = getIt<FunctionResponse>();
-    try {
-      serviceShop = ServiceShop(
-        id: serviceShop.id,
-        name: name,
-        email: serviceShop.email,
-        password: serviceShop.password,
-        address: serviceShop.address,
-        phone: serviceShop.phone,
-        openingTime: serviceShop.openingTime,
-        closingTime: serviceShop.closingTime,
-        coverImage: shopCoverImage,
-        rating: serviceShop.rating,
-        shopLocation: serviceShop.shopLocation,
-      );
-      fResponse.passed(message: 'Updated Profile');
-    } catch (e) {
-      fResponse.failed(message: 'Unable to update profile : $e');
-    }
-    return fResponse;
-  }
+  // @action
+  // FunctionResponse updateProfile(String name) {
+  //   FunctionResponse fResponse = getIt<FunctionResponse>();
+  //   try {
+  //     serviceShop = ServiceShop(
+  //       id: serviceShop.id,
+  //       name: name,
+  //       email: serviceShop.email,
+  //       password: serviceShop.password,
+  //       address: serviceShop.address,
+  //       phone: serviceShop.phone,
+  //       openingTime: serviceShop.openingTime,
+  //       closingTime: serviceShop.closingTime,
+  //       coverImage: shopCoverImage,
+  //       rating: serviceShop.rating,
+  //       shopLocation: serviceShop.shopLocation,
+  //     );
+  //     fResponse.passed(message: 'Updated Profile');
+  //   } catch (e) {
+  //     fResponse.failed(message: 'Unable to update profile : $e');
+  //   }
+  //   return fResponse;
+  // }
 }

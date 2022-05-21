@@ -19,7 +19,7 @@ Widget customContainer(
     padding: padding,
     clipBehavior: Clip.hardEdge,
     decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(20.0),
         color: _appColor.accentColorLight,
         boxShadow: const [
           BoxShadow(
@@ -55,11 +55,17 @@ Widget customImageBox(double width, ThemeData _theme,
                   fit: BoxFit.cover,
                 )
               : (imageType == ImageType.network
-                  ? Image.network(
-                      image,
+                  ? CachedNetworkImage(
+                      imageUrl: image,
                       width: width * 0.9,
                       height: width * 0.9,
                       fit: BoxFit.cover,
+                      progressIndicatorBuilder:
+                          (context, url, downloadProgress) => Center(
+                              child: CircularProgressIndicator.adaptive(
+                                  value: downloadProgress.progress)),
+                      errorWidget: (context, url, error) =>
+                          const Center(child: Icon(Icons.error)),
                     )
                   : Image.asset(
                       image,
@@ -100,8 +106,11 @@ Widget buildImage(ThemeData theme, String imagePath) {
               imageUrl: imagePath,
               fit: BoxFit.cover,
               progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  CircularProgressIndicator(value: downloadProgress.progress),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+                  Center(
+                      child: CircularProgressIndicator(
+                          value: downloadProgress.progress)),
+              errorWidget: (context, url, error) =>
+                  const Center(child: Icon(Icons.error)),
             )
           : (imageType == ImageType.file
               ? Image.file(

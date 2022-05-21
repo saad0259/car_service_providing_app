@@ -54,9 +54,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _profileStore.changeShopCoverImage(_profileStore.serviceShop.coverImage);
-    _profileStore.changeShopAddress(_profileStore.serviceShop.address);
-    _profileStore.changeShopLocation(_profileStore.serviceShop.shopLocation);
+    // _profileStore.changeShopCoverImage(_profileStore.serviceShop.coverImage);
+    // _profileStore.changeShopAddress(_profileStore.serviceShop.address);
+    // _profileStore.changeShopLocation(_profileStore.serviceShop.shopLocation);
   }
 
   //Functions
@@ -91,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _customAlerts.showLoaderDialog(context);
       fResponse = await _connectivityHelper.checkInternetConnection();
       if (fResponse.success) {
-        fResponse = _profileStore.updateProfile(name);
+        // fResponse = _profileStore.updateProfile(name);
       }
       _customAlerts.popLoader(context);
     }

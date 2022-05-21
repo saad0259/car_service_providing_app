@@ -185,11 +185,11 @@ abstract class _AuthStore with Store {
               email: newServiceShop.email, password: newServiceShop.password);
       if (_authResult.user != null) {
         fResponse = await _customImageHelper.uploadPicture(
-            (newServiceShop.coverImage), serviceShopImages);
+            (newServiceShop.coverImage), serviceShopImagesDirectory);
         if (fResponse.success) {
           updateCoverImage(fResponse.data);
 
-          await firestoreShops.doc(_authResult.user!.uid).set({
+          await firestoreShopsCollection.doc(_authResult.user!.uid).set({
             'name': newServiceShop.name,
             'email': newServiceShop.email,
             'password': newServiceShop.password,
