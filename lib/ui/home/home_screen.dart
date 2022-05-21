@@ -198,19 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             const SizedBox(height: 20),
                             BookingStats(theme: theme),
                             const SizedBox(height: 20),
-                            Observer(builder: (_) {
-                              return _carWashServices(
-                                  context, theme, screenWidth);
-                            }),
-                            const SizedBox(height: 20),
-                            Observer(builder: (_) {
-                              return _workshopServices(
-                                  context, theme, screenWidth);
-                            }),
-                            const SizedBox(height: 20),
-                            Observer(builder: (_) {
-                              return _tyreServices(context, theme, screenWidth);
-                            }),
+                            AddedServices(),
                             const SizedBox(height: 20),
                           ],
                         ),
@@ -225,176 +213,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   foregroundColor: theme.colorScheme.secondary,
                   label: const Text('Add Service'),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(20.0),
                   ),
                 ),
               );
       }),
     );
-  }
-
-  Widget _tyreServices(
-      BuildContext context, ThemeData theme, double screenWidth) {
-    return Observer(builder: (_) {
-      return Column(
-        children: [
-          Text(
-            'Tyre Shop',
-            style: theme.textTheme.headline3,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _manageServiceStore.vehicleServiceList
-                        .where((element) =>
-                            element.serviceType == ServiceType.tyreRepair ||
-                            element.serviceType == ServiceType.tyreChange)
-                        .isEmpty
-                    ? Center(
-                        child: Text(
-                          'No Record Found',
-                          style: theme.textTheme.headline5,
-                        ),
-                      )
-                    : Wrap(
-                        alignment: WrapAlignment.spaceAround,
-                        runSpacing: 20,
-                        children: _manageServiceStore.vehicleServiceList
-                            .where((element) => (element.serviceType ==
-                                    ServiceType.tyreChange ||
-                                element.serviceType == ServiceType.tyreRepair))
-                            .map((element) => customImageBox(
-                                  screenWidth * 0.4,
-                                  theme,
-                                  key: ValueKey(element.id),
-                                  image: element.coverImage,
-                                  title: element.serviceName,
-                                  price: element.cost,
-                                  onTap: () {
-                                    // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
-                                  },
-                                ))
-                            .toList(),
-                      ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
-    });
-  }
-
-  Widget _workshopServices(
-      BuildContext context, ThemeData theme, double screenWidth) {
-    return Observer(builder: (_) {
-      return Column(
-        children: [
-          Text(
-            'Workshop Services',
-            style: theme.textTheme.headline3,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _manageServiceStore.vehicleServiceList
-                        .where((element) =>
-                            element.serviceType == ServiceType.batteryIssue ||
-                            element.serviceType == ServiceType.oilChange ||
-                            element.serviceType == ServiceType.carService ||
-                            element.serviceType == ServiceType.breakService)
-                        .isEmpty
-                    ? Center(
-                        child: Text(
-                          'No Record Found',
-                          style: theme.textTheme.headline5,
-                        ),
-                      )
-                    : Wrap(
-                        alignment: WrapAlignment.spaceAround,
-                        runSpacing: 20,
-                        children: _manageServiceStore.vehicleServiceList
-                            .where((element) => (element.serviceType ==
-                                    ServiceType.batteryIssue ||
-                                element.serviceType == ServiceType.oilChange ||
-                                element.serviceType == ServiceType.carService ||
-                                element.serviceType ==
-                                    ServiceType.breakService))
-                            .map((element) => customImageBox(
-                                  screenWidth * 0.4,
-                                  theme,
-                                  key: ValueKey(element.id),
-                                  image: element.coverImage,
-                                  title: element.serviceName,
-                                  price: element.cost,
-                                  onTap: () {
-                                    // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
-                                  },
-                                ))
-                            .toList(),
-                      ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
-    });
-  }
-
-  Widget _carWashServices(
-      BuildContext context, ThemeData theme, double screenWidth) {
-    return Observer(builder: (_) {
-      return Column(
-        children: [
-          Text(
-            'Car Wash',
-            style: theme.textTheme.headline3,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: _manageServiceStore.vehicleServiceList
-                        .where((element) =>
-                            element.serviceType == ServiceType.fullCarWash ||
-                            element.serviceType == ServiceType.halfCarWash)
-                        .isEmpty
-                    ? Center(
-                        child: Text(
-                          'No Record Found',
-                          style: theme.textTheme.headline5,
-                        ),
-                      )
-                    : Wrap(
-                        alignment: WrapAlignment.spaceAround,
-                        runSpacing: 20,
-                        children: _manageServiceStore.vehicleServiceList
-                            .where((element) => (element.serviceType ==
-                                    ServiceType.fullCarWash ||
-                                element.serviceType == ServiceType.halfCarWash))
-                            .map((element) => customImageBox(
-                                  screenWidth * 0.4,
-                                  theme,
-                                  key: ValueKey(element.id),
-                                  image: element.coverImage,
-                                  title: element.serviceName,
-                                  price: element.cost,
-                                  onTap: () {
-                                    // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
-                                  },
-                                ))
-                            .toList(),
-                      ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-        ],
-      );
-    });
   }
 }
 
@@ -480,4 +304,215 @@ class BookingStats extends StatelessWidget {
           ],
         ));
   }
+}
+
+class AddedServices extends StatefulWidget {
+  AddedServices({Key? key}) : super(key: key);
+
+  @override
+  State<AddedServices> createState() => _AddedServicesState();
+}
+
+class _AddedServicesState extends State<AddedServices> {
+  //Stores
+  final ManageServiceStore _manageServiceStore = getIt<ManageServiceStore>();
+
+  @override
+  void initState() {
+    _manageServiceStore.loadAllServices();
+
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    //ThemeData & constraints
+    ThemeData theme = Theme.of(context);
+    final double screenHeight = MediaQuery.of(context).size.height;
+    final double screenWidth = MediaQuery.of(context).size.width;
+
+    return Observer(builder: (_) {
+      return _manageServiceStore.isLoadingAllServices
+          ? const Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: Center(
+                child: CircularProgressIndicator.adaptive(),
+              ),
+            )
+          : Column(
+              children: [
+                _carWashServices(
+                    context, theme, screenWidth, _manageServiceStore),
+                const SizedBox(height: 20),
+                _workshopServices(
+                    context, theme, screenWidth, _manageServiceStore),
+                const SizedBox(height: 20),
+                _tyreServices(context, theme, screenWidth, _manageServiceStore),
+              ],
+            );
+    });
+  }
+}
+
+Widget _tyreServices(BuildContext context, ThemeData theme, double screenWidth,
+    ManageServiceStore _manageServiceStore) {
+  return Observer(builder: (_) {
+    return Column(
+      children: [
+        Text(
+          'Tyre Shop',
+          style: theme.textTheme.headline3,
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: _manageServiceStore.vehicleServiceList
+                      .where((element) =>
+                          element.serviceType == ServiceType.tyreRepair ||
+                          element.serviceType == ServiceType.tyreChange)
+                      .isEmpty
+                  ? Center(
+                      child: Text(
+                        'No Record Found',
+                        style: theme.textTheme.headline5,
+                      ),
+                    )
+                  : Wrap(
+                      alignment: WrapAlignment.spaceAround,
+                      runSpacing: 20,
+                      children: _manageServiceStore.vehicleServiceList
+                          .where((element) => (element.serviceType ==
+                                  ServiceType.tyreChange ||
+                              element.serviceType == ServiceType.tyreRepair))
+                          .map((element) => customImageBox(
+                                screenWidth * 0.4,
+                                theme,
+                                key: ValueKey(element.id),
+                                image: element.coverImage,
+                                title: element.serviceName,
+                                price: element.cost,
+                                onTap: () {
+                                  // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
+                                },
+                              ))
+                          .toList(),
+                    ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  });
+}
+
+Widget _workshopServices(BuildContext context, ThemeData theme,
+    double screenWidth, ManageServiceStore _manageServiceStore) {
+  return Observer(builder: (_) {
+    return Column(
+      children: [
+        Text(
+          'Workshop Services',
+          style: theme.textTheme.headline3,
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: _manageServiceStore.vehicleServiceList
+                      .where((element) =>
+                          element.serviceType == ServiceType.batteryIssue ||
+                          element.serviceType == ServiceType.oilChange ||
+                          element.serviceType == ServiceType.carService ||
+                          element.serviceType == ServiceType.breakService)
+                      .isEmpty
+                  ? Center(
+                      child: Text(
+                        'No Record Found',
+                        style: theme.textTheme.headline5,
+                      ),
+                    )
+                  : Wrap(
+                      alignment: WrapAlignment.spaceAround,
+                      runSpacing: 20,
+                      children: _manageServiceStore.vehicleServiceList
+                          .where((element) => (element.serviceType ==
+                                  ServiceType.batteryIssue ||
+                              element.serviceType == ServiceType.oilChange ||
+                              element.serviceType == ServiceType.carService ||
+                              element.serviceType == ServiceType.breakService))
+                          .map((element) => customImageBox(
+                                screenWidth * 0.4,
+                                theme,
+                                key: ValueKey(element.id),
+                                image: element.coverImage,
+                                title: element.serviceName,
+                                price: element.cost,
+                                onTap: () {
+                                  // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
+                                },
+                              ))
+                          .toList(),
+                    ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  });
+}
+
+Widget _carWashServices(BuildContext context, ThemeData theme,
+    double screenWidth, ManageServiceStore _manageServiceStore) {
+  return Observer(builder: (_) {
+    return Column(
+      children: [
+        Text(
+          'Car Wash',
+          style: theme.textTheme.headline3,
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: _manageServiceStore.vehicleServiceList
+                      .where((element) =>
+                          element.serviceType == ServiceType.fullCarWash ||
+                          element.serviceType == ServiceType.halfCarWash)
+                      .isEmpty
+                  ? Center(
+                      child: Text(
+                        'No Record Found',
+                        style: theme.textTheme.headline5,
+                      ),
+                    )
+                  : Wrap(
+                      alignment: WrapAlignment.spaceAround,
+                      runSpacing: 20,
+                      children: _manageServiceStore.vehicleServiceList
+                          .where((element) => (element.serviceType ==
+                                  ServiceType.fullCarWash ||
+                              element.serviceType == ServiceType.halfCarWash))
+                          .map((element) => customImageBox(
+                                screenWidth * 0.4,
+                                theme,
+                                key: ValueKey(element.id),
+                                image: element.coverImage,
+                                title: element.serviceName,
+                                price: element.cost,
+                                onTap: () {
+                                  // Navigator.of(context).pushNamed(ServiceBookingScreen.routeName);
+                                },
+                              ))
+                          .toList(),
+                    ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 20),
+      ],
+    );
+  });
 }
