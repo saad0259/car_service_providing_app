@@ -122,7 +122,7 @@ class SignupScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: _appColors.loginScaffoldColor,
         body: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             height: screenHeight * 1.5,
             width: screenWidth,
             child: Stack(
@@ -294,6 +294,8 @@ class SignupScreen extends StatelessWidget {
                                   const SizedBox(height: 20),
 
                                   Observer(builder: (_) {
+                                    print(
+                                        _authStore.newServiceShop.shopLocation);
                                     return TextFormField(
                                       readOnly: true,
                                       validator:

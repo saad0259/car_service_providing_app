@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
 
 import '../../custom_utils/connectivity_helper.dart';
 import '../../custom_utils/custom_alerts.dart';
@@ -112,14 +111,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       // _customAlerts.showLoaderDialog(context);
 
-      fResponse = _googleMapsHelper.showPlacePicker(context);
+      // fResponse = _googleMapsHelper.showPlacePicker(context);
 
       if (fResponse.success) {
-        final PickResult pickResult = fResponse.data;
+        // final PickResult pickResult = fResponse.data;
         // fResponse =
-        _profileStore.changeShopLocation(LatLng(
-            pickResult.geometry!.location.lat,
-            pickResult.geometry!.location.lng));
+        // _profileStore.changeShopLocation(LatLng(
+        //     pickResult.geometry!.location.lat,
+        //     pickResult.geometry!.location.lng));
       }
       // _customAlerts.popLoader(context);
     } catch (e) {
