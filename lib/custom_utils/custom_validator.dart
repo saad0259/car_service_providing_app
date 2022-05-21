@@ -76,7 +76,7 @@ class CustomValidator {
     return null;
   }
 
-  String? validateMobile(String? value) {
+  String? phone(String? value) {
     if (value == null) {
       return 'Add Mobile Number';
     }

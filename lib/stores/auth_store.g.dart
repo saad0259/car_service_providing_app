@@ -83,6 +83,17 @@ mixin _$AuthStore on _AuthStore, Store {
   }
 
   @override
+  void updateLocation(LatLng location) {
+    final _$actionInfo = _$_AuthStoreActionController.startAction(
+        name: '_AuthStore.updateLocation');
+    try {
+      return super.updateLocation(location);
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   void updateEmail(String email) {
     final _$actionInfo = _$_AuthStoreActionController.startAction(
         name: '_AuthStore.updateEmail');
@@ -99,6 +110,17 @@ mixin _$AuthStore on _AuthStore, Store {
         name: '_AuthStore.updatePassword');
     try {
       return super.updatePassword(password);
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updatePhone(String newphone) {
+    final _$actionInfo = _$_AuthStoreActionController.startAction(
+        name: '_AuthStore.updatePhone');
+    try {
+      return super.updatePhone(newphone);
     } finally {
       _$_AuthStoreActionController.endAction(_$actionInfo);
     }

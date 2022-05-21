@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class Vehicle {
   String id;
@@ -63,6 +64,45 @@ extension VehicleTypeName on VehicleType {
         break;
     }
     return name;
+  }
+}
+
+extension VehicleTypeIcon on VehicleType {
+  Widget getIcon() {
+    Widget icon = const Icon(Icons.do_not_disturb);
+    switch (this) {
+      case VehicleType.bike:
+        icon = const Icon(Icons.directions_bike);
+        break;
+
+      case VehicleType.suv:
+        icon = const FaIcon(FontAwesomeIcons.carSide);
+        break;
+
+      case VehicleType.auto:
+        icon = const Icon(Icons.electric_rickshaw);
+        break;
+
+      case VehicleType.sedan:
+        icon = const Icon(Icons.directions_car);
+        break;
+
+      case VehicleType.truck:
+        icon = const FaIcon(FontAwesomeIcons.truck);
+        break;
+
+      case VehicleType.wagon:
+        icon = const FaIcon(FontAwesomeIcons.vanShuttle);
+        break;
+
+      case VehicleType.bus:
+        icon = const Icon(Icons.directions_bus);
+        break;
+
+      default:
+        break;
+    }
+    return icon;
   }
 }
 

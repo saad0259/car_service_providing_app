@@ -2,6 +2,7 @@ import 'package:car_service_providing_app/models/vehicle.dart';
 import 'package:car_service_providing_app/models/vehicle_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../custom_utils/google_maps_helper.dart';
 import '../../resources/app_images.dart';
 import '../../custom_widgets/custom_wrappers.dart';
@@ -103,7 +104,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             },
                             icon: const Icon(Icons.location_on_sharp)),
                         const SizedBox(width: 10),
-                        const Icon(Icons.phone),
+                        IconButton(
+                            onPressed: () {
+                              launchUrl(Uri.parse(
+                                  "tel://${_profileStore.currentUser?.phone ?? '+9230123456789'}"));
+                            },
+                            icon: const Icon(Icons.phone)),
                       ],
                     ),
                     const SizedBox(height: 10),

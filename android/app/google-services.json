@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1003077221279",
+    "project_id": "car-service-app-ff91a",
+    "storage_bucket": "car-service-app-ff91a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1003077221279:android:e4ac415887e4bf92d4dbaa",
+        "android_client_info": {
+          "package_name": "com.example.car_service_providing_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1003077221279-ct28legatnm24fvcgou4vpsoh1g6nb1f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOGHG33SnmmmhGTAckzi5FDUcHq6H4QxU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1003077221279-ct28legatnm24fvcgou4vpsoh1g6nb1f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

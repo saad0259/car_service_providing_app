@@ -1,7 +1,11 @@
 import 'package:car_service_providing_app/custom_utils/google_maps_helper.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:mobx/mobx.dart';
 
+import '../constants/firebase_constants.dart';
 import '../custom_utils/function_response.dart';
 import '../models/service_shop.dart';
 import '../service_locator.dart';
@@ -18,6 +22,7 @@ abstract class _AuthStore with Store {
     email: '',
     password: '',
     address: '',
+    phone: '',
     openingTime: TimeOfDay.now(),
     closingTime: TimeOfDay.now(),
     coverImage: '',
@@ -39,6 +44,7 @@ abstract class _AuthStore with Store {
       email: newServiceShop.email,
       password: newServiceShop.password,
       address: newServiceShop.address,
+      phone: newServiceShop.phone,
       openingTime: newServiceShop.openingTime,
       closingTime: newServiceShop.closingTime,
       coverImage: image,
@@ -55,11 +61,29 @@ abstract class _AuthStore with Store {
       email: newServiceShop.email,
       password: newServiceShop.password,
       address: newServiceShop.address,
+      phone: newServiceShop.phone,
       openingTime: newServiceShop.openingTime,
       closingTime: newServiceShop.closingTime,
       coverImage: newServiceShop.coverImage,
       rating: newServiceShop.rating,
       shopLocation: newServiceShop.shopLocation,
+    );
+  }
+
+  @action
+  void updateLocation(LatLng location) {
+    newServiceShop = ServiceShop(
+      id: newServiceShop.id,
+      name: newServiceShop.name,
+      email: newServiceShop.email,
+      password: newServiceShop.password,
+      address: newServiceShop.address,
+      phone: newServiceShop.phone,
+      openingTime: newServiceShop.openingTime,
+      closingTime: newServiceShop.closingTime,
+      coverImage: newServiceShop.coverImage,
+      rating: newServiceShop.rating,
+      shopLocation: location,
     );
   }
 
@@ -71,6 +95,7 @@ abstract class _AuthStore with Store {
       email: email,
       password: newServiceShop.password,
       address: newServiceShop.address,
+      phone: newServiceShop.phone,
       openingTime: newServiceShop.openingTime,
       closingTime: newServiceShop.closingTime,
       coverImage: newServiceShop.coverImage,
@@ -87,6 +112,24 @@ abstract class _AuthStore with Store {
       email: newServiceShop.email,
       password: password,
       address: newServiceShop.address,
+      phone: newServiceShop.phone,
+      openingTime: newServiceShop.openingTime,
+      closingTime: newServiceShop.closingTime,
+      coverImage: newServiceShop.coverImage,
+      rating: newServiceShop.rating,
+      shopLocation: newServiceShop.shopLocation,
+    );
+  }
+
+  @action
+  void updatePhone(String newphone) {
+    newServiceShop = ServiceShop(
+      id: newServiceShop.id,
+      name: newServiceShop.name,
+      email: newServiceShop.email,
+      password: newServiceShop.password,
+      address: newServiceShop.address,
+      phone: newphone,
       openingTime: newServiceShop.openingTime,
       closingTime: newServiceShop.closingTime,
       coverImage: newServiceShop.coverImage,
@@ -107,6 +150,7 @@ abstract class _AuthStore with Store {
       email: '',
       password: '',
       address: '',
+      phone: '',
       openingTime: TimeOfDay.now(),
       closingTime: TimeOfDay.now(),
       coverImage: '',
@@ -117,16 +161,19 @@ abstract class _AuthStore with Store {
     return fResponse;
   }
 
-  FunctionResponse tryLogin(String email, String password) {
+  Future<FunctionResponse> tryLogin(String email, String password) async {
     FunctionResponse fResponse = getIt<FunctionResponse>();
 
-    currentUser = serviceShopeList.firstWhere(
-        (element) => element.email == email && element.password == password,
-        orElse: null);
-    if (currentUser != null) {
-      fResponse.passed(message: 'Login Successfull');
-    } else {
-      fResponse.failed(message: 'Credentials do not match');
+    try {
+      await firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
+      fResponse.passed(message: 'Login Successful');
+    } on FirebaseAuthException catch (e) {
+      fResponse.failed(
+          message:
+              e.message ?? 'Error occurred, please check your credentials!');
+    } catch (e) {
+      fResponse.failed(message: 'Error logging in : $e');
     }
 
     return fResponse;

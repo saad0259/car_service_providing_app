@@ -9,6 +9,7 @@ class ServiceShop {
   String coverImage;
   double rating;
   String address;
+  String phone;
   TimeOfDay openingTime;
   TimeOfDay closingTime;
   LatLng shopLocation;
@@ -18,6 +19,7 @@ class ServiceShop {
     required this.email,
     required this.password,
     required this.address,
+    required this.phone,
     required this.openingTime,
     required this.closingTime,
     required this.coverImage,

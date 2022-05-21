@@ -22,6 +22,7 @@ class LoginScreen extends StatelessWidget {
 
   //Form
   final _formKey = GlobalKey<FormState>();
+  Map<String, String> _formData = {'email': '', 'password': ''};
 
   //Custom Utils
   final CustomValidator _customValidator = getIt<CustomValidator>();
@@ -45,8 +46,8 @@ class LoginScreen extends StatelessWidget {
       _customAlerts.showLoaderDialog(context);
       fResponse = await _connectivityHelper.checkInternetConnection();
       if (fResponse.success) {
-        // fResponse = _authStore.trySignup();
-        fResponse.message = 'Login Successfull';
+        fResponse = await _authStore.tryLogin(
+            _formData['email'] ?? '', _formData['password'] ?? '');
       }
       _customAlerts.popLoader(context);
     }
@@ -112,18 +113,13 @@ class LoginScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 20),
                             TextFormField(
-                              // enabled: !_authStore.isAuthenticating,
-                              validator: _customValidator.nonNullableString,
-
-                              // inputFormatters: [
-                              //   UpperCaseTextFormatter(),
-                              // ],
-                              // onSaved: (String? val) {
-                              //   if (val == null) {
-                              //     return;
-                              //   }
-                              //   _formData['lastName'] = val;
-                              // },
+                              validator: _customValidator.validateEmail,
+                              onSaved: (String? val) {
+                                if (val == null) {
+                                  return;
+                                }
+                                _formData['email'] = val;
+                              },
                               keyboardType: TextInputType.emailAddress,
                               decoration: const InputDecoration(
                                 label: Text('Email'),
@@ -132,17 +128,13 @@ class LoginScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 20),
                             TextFormField(
-                              // enabled: !_authStore.isAuthenticating,
                               validator: _customValidator.nonNullableString,
-                              // inputFormatters: [
-                              //   UpperCaseTextFormatter(),
-                              // ],
-                              // onSaved: (String? val) {
-                              //   if (val == null) {
-                              //     return;
-                              //   }
-                              //   _formData['lastName'] = val;
-                              // },
+                              onSaved: (String? val) {
+                                if (val == null) {
+                                  return;
+                                }
+                                _formData['password'] = val;
+                              },
                               obscureText: true,
                               keyboardType: TextInputType.visiblePassword,
                               decoration: const InputDecoration(
