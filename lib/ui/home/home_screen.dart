@@ -12,11 +12,12 @@ import '../../service_locator.dart';
 import '../../stores/home_screen_store.dart';
 import '../../stores/manage_service_store.dart';
 import '../../stores/profile_store.dart';
+import '../../stores/service_request_store.dart';
 import '../auth/login_screen.dart';
 import '../manage_services/add_service_screen.dart';
 import '../service_requests/service_request_list_screen.dart';
 import '../shop_profile/profile_screen.dart';
-import '../../constants/firebase_constants.dart' as fb;
+import '../../constants/firebase_constants.dart';
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({Key? key}) : super(key: key);
@@ -36,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final ManageServiceStore _manageServiceStore = getIt<ManageServiceStore>();
   final ProfileStore _profileStore = getIt<ProfileStore>();
   final HomeScreenStore _homeScreenStore = getIt<HomeScreenStore>();
+  final ServiceRequestStore _serviceRequestStore = getIt<ServiceRequestStore>();
 
   //Utilities
   final GoogleMapsHelper _googleMapsHelper = getIt<GoogleMapsHelper>();
@@ -57,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _customAlerts.showLoaderDialog(context);
       fResponse = await _connectivityHelper.checkInternetConnection();
       if (fResponse.success) {
-        await fb.firebaseAuth.signOut();
+        await firebaseAuth.signOut();
         fResponse.passed(message: 'Sign Out Successful');
       }
     } catch (e) {
@@ -196,7 +198,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                             const SizedBox(height: 20),
-                            BookingStats(theme: theme),
+                            BookingStats(
+                              theme: theme,
+                              serviceRequestStore: _serviceRequestStore,
+                            ),
                             const SizedBox(height: 20),
                             AddedServices(),
                             const SizedBox(height: 20),
@@ -222,17 +227,29 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class BookingStats extends StatelessWidget {
+class BookingStats extends StatefulWidget {
   const BookingStats({
     Key? key,
     required this.theme,
+    required this.serviceRequestStore,
     // required this.homeScreenStore,
   }) : super(key: key);
 
   final ThemeData theme;
-//Stores
-  // final HomeScreenStore homeScreenStore;
+  final ServiceRequestStore serviceRequestStore;
 
+  @override
+  State<BookingStats> createState() => _BookingStatsState();
+}
+
+class _BookingStatsState extends State<BookingStats> {
+  @override
+  void initState() {
+    widget.serviceRequestStore.loadAllServiceRequests();
+    super.initState();
+  }
+
+//Stores
   @override
   Widget build(BuildContext context) {
     return customContainer(
@@ -241,25 +258,31 @@ class BookingStats extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
-              child: InkWell(
-                onTap: () => Navigator.of(context)
-                    .pushNamed(ServiceRequestListScreen.routeName),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Text(
-                      //   manageVehicleStore.userVehicleList.length.toString(),
-                      //   style: theme.textTheme.headline4,
-                      // ),
-                      Text(
-                        'Orders',
-                        style: theme.textTheme.headline5,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              child: Observer(builder: (_) {
+                return widget.serviceRequestStore.isLoadingOrders
+                    ? const Center(
+                        child: CircularProgressIndicator.adaptive(),
+                      )
+                    : InkWell(
+                        onTap: () => Navigator.of(context)
+                            .pushNamed(ServiceRequestListScreen.routeName),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Text(
+                              //   manageVehicleStore.userVehicleList.length.toString(),
+                              //   style: theme.textTheme.headline4,
+                              // ),
+                              Text(
+                                'Orders',
+                                style: widget.theme.textTheme.headline5,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+              }),
             ),
             Expanded(
               child: Center(
@@ -277,7 +300,7 @@ class BookingStats extends StatelessWidget {
                       // }),
                       Text(
                         'Reviews',
-                        style: theme.textTheme.headline5,
+                        style: widget.theme.textTheme.headline5,
                       ),
                     ],
                   ),
@@ -295,7 +318,7 @@ class BookingStats extends StatelessWidget {
                     // ),
                     Text(
                       'Messages',
-                      style: theme.textTheme.headline5,
+                      style: widget.theme.textTheme.headline5,
                     ),
                   ],
                 ),
