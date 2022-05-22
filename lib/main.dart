@@ -14,7 +14,7 @@ import 'ui/manage_services/add_service_screen.dart';
 import 'ui/service_requests/service_request_details_screen.dart';
 import 'ui/service_requests/service_request_list_screen.dart';
 import 'ui/shop_profile/profile_screen.dart';
-import './constants/firebase_constants.dart' as fb;
+import './constants/firebase_constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,7 +42,7 @@ class _MyAppState extends State<MyApp> {
       onUnknownRoute: (settings) =>
           MaterialPageRoute(builder: (ctx) => HomeScreen()),
       home: StreamBuilder(
-        stream: fb.firebaseAuth.authStateChanges(),
+        stream: firebaseAuth.authStateChanges(),
         builder: (ctx, userSnapshot) {
           print('user found');
           if (userSnapshot.hasData) {

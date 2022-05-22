@@ -36,7 +36,6 @@ dependencies:
   connectivity_plus: ^2.3.0
   get_it: ^7.2.0
   string_validator: ^0.3.0
-  google_maps_place_picker_mb: ^2.0.0-mb.18
   google_maps_flutter: ^2.1.5
   intl: ^0.17.0
   image_picker: ^0.8.5+3
