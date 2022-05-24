@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image_picker/image_picker.dart';
 import 'function_response.dart';
 import 'package:flutter/material.dart';
@@ -101,5 +104,27 @@ class CustomImageHelper {
             ));
 
     return _fResponse;
+  }
+
+  Future<FunctionResponse> uploadPicture(String image, String directory) async {
+    FunctionResponse fResponse = FunctionResponse();
+
+    try {
+      FirebaseStorage _storage = FirebaseStorage.instance;
+      Reference ref = _storage
+          .ref()
+          .child('$directory/${DateTime.now().toIso8601String()}');
+      print('got ref = $ref');
+      await ref.putFile(File(image));
+      print('uploaded image = $ref');
+      String imageUrl = await ref.getDownloadURL();
+      print('got URL $imageUrl');
+
+      fResponse.data = imageUrl;
+      fResponse.passed(message: 'Image successfully uploaded');
+    } catch (e) {
+      fResponse.failed(message: 'Error Uploading Image : $e');
+    }
+    return fResponse;
   }
 }

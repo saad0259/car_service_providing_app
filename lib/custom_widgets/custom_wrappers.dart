@@ -1,5 +1,5 @@
 import 'dart:io';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../theme/my_app_colors.dart';
 import '../../service_locator.dart';
@@ -19,7 +19,7 @@ Widget customContainer(
     padding: padding,
     clipBehavior: Clip.hardEdge,
     decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(20.0),
         color: _appColor.accentColorLight,
         boxShadow: const [
           BoxShadow(
@@ -55,11 +55,17 @@ Widget customImageBox(double width, ThemeData _theme,
                   fit: BoxFit.cover,
                 )
               : (imageType == ImageType.network
-                  ? Image.network(
-                      image,
+                  ? CachedNetworkImage(
+                      imageUrl: image,
                       width: width * 0.9,
                       height: width * 0.9,
                       fit: BoxFit.cover,
+                      progressIndicatorBuilder:
+                          (context, url, downloadProgress) => Center(
+                              child: CircularProgressIndicator.adaptive(
+                                  value: downloadProgress.progress)),
+                      errorWidget: (context, url, error) =>
+                          const Center(child: Icon(Icons.error)),
                     )
                   : Image.asset(
                       image,
@@ -96,28 +102,15 @@ Widget buildImage(ThemeData theme, String imagePath) {
   final Widget returnAble = imagePath.isEmpty
       ? const SizedBox()
       : (imageType == ImageType.network
-          ? Image.network(
-              imagePath,
+          ? CachedNetworkImage(
+              imageUrl: imagePath,
               fit: BoxFit.cover,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) return child;
-                return Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                        : null,
-                  ),
-                );
-              },
-              errorBuilder: (BuildContext context, Object exception,
-                  StackTrace? stackTrace) {
-                return Icon(
-                  Icons.error,
-                  color: theme.colorScheme.error,
-                );
-              },
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  Center(
+                      child: CircularProgressIndicator(
+                          value: downloadProgress.progress)),
+              errorWidget: (context, url, error) =>
+                  const Center(child: Icon(Icons.error)),
             )
           : (imageType == ImageType.file
               ? Image.file(

@@ -10,6 +10,7 @@ import '../../custom_utils/custom_validator.dart';
 import '../../custom_utils/function_response.dart';
 import '../../custom_utils/google_maps_helper.dart';
 import '../../custom_utils/image_helper.dart';
+import '../../models/service_shop.dart';
 import '../../models/vehicle.dart';
 import '../../models/vehicle_service.dart';
 import '../../service_locator.dart';
@@ -63,10 +64,10 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
         _manageServiceStore.changeCoverImage(fResponse.data);
         fResponse.passed(message: 'Uploaded new Image');
       }
-      _customAlerts.popLoader(context);
     } catch (e) {
       fResponse.failed(message: 'Unable to change user Image : $e');
     }
+    _customAlerts.popLoader(context);
   }
 
   Future<void> addNewService(BuildContext context) async {
@@ -82,12 +83,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
       _customAlerts.showLoaderDialog(context);
       fResponse = await _connectivityHelper.checkInternetConnection();
       if (fResponse.success) {
-        fResponse = await _manageServiceStore.addNewService(
-            _profileStore.currentUser!.id,
-            _profileStore.currentUser!.name,
-            _profileStore.currentUser!.rating,
-            _profileStore.currentUser!.address,
-            _profileStore.currentUser!.shopLocation);
+        fResponse = await _manageServiceStore.addNewService();
       }
       _customAlerts.popLoader(context);
     }
@@ -111,60 +107,84 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
 
     return SafeArea(
       child: Scaffold(
+        // backgroundColor: theme.colorScheme.primary,
         appBar: AppBar(),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text(
-                'Add New Vehicle',
-                style: theme.textTheme.headline3,
-              ),
-              const SizedBox(height: 20),
-              Card(
-                  child: Form(
-                key: _formKey,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 15.0, vertical: 30),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        const SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Expanded(
-                                child: InkWell(
-                              onTap: () async {
-                                await changeCoverImage(context);
-                              },
-                              child: Observer(builder: (_) {
-                                return customContainer(
-                                    height: 150,
-                                    child: buildImage(
-                                        theme,
-                                        _manageServiceStore
-                                            .newVehicleService.coverImage));
-                              }),
-                            )),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        serviceNameField(),
-                        const SizedBox(height: 20),
-                        serviceDescriptionField(),
-                        const SizedBox(height: 20),
-                        servicePriceField(),
-                        const SizedBox(height: 20),
-                        vehicleTypeDropdown(theme),
-                        const SizedBox(height: 20),
-                        serviceTypeDropdown(theme),
-                        const SizedBox(height: 20),
-                        saveButton(context),
-                      ]),
+          child: Padding(
+            padding: const EdgeInsets.all(18.0),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                Text(
+                  'Add New Vehicle',
+                  style: theme.textTheme.headline2,
                 ),
-              )),
-            ],
+                const SizedBox(height: 10),
+                customContainer(
+                    child: Form(
+                  key: _formKey,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15.0, vertical: 30),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          const SizedBox(height: 20),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: InkWell(
+                                onTap: () async {
+                                  await changeCoverImage(context);
+                                },
+                                child: Observer(builder: (_) {
+                                  return customContainer(
+                                      height: 150,
+                                      child: _manageServiceStore
+                                              .newVehicleService
+                                              .coverImage
+                                              .isEmpty
+                                          ? Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                  Text(
+                                                    'Pick Cover Image',
+                                                    style: theme
+                                                        .textTheme.headline3,
+                                                  ),
+                                                  const Icon(
+                                                    Icons.add,
+                                                    size: 70,
+                                                  )
+                                                ])
+                                          : buildImage(
+                                              theme,
+                                              _manageServiceStore
+                                                  .newVehicleService
+                                                  .coverImage));
+                                }),
+                              )),
+                            ],
+                          ),
+                          const SizedBox(height: 20),
+                          serviceNameField(),
+                          const SizedBox(height: 20),
+                          serviceDescriptionField(),
+                          const SizedBox(height: 20),
+                          servicePriceField(),
+                          const SizedBox(height: 20),
+                          vehicleTypeDropdown(theme),
+                          const SizedBox(height: 20),
+                          serviceTypeDropdown(theme),
+                          const SizedBox(height: 20),
+                          saveButton(context),
+                        ]),
+                  ),
+                )),
+              ],
+            ),
           ),
         ),
       ),

@@ -9,6 +9,23 @@ part of 'manage_service_store.dart';
 // ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
 
 mixin _$ManageServiceStore on _ManageServiceStore, Store {
+  late final _$isLoadingAllServicesAtom =
+      Atom(name: '_ManageServiceStore.isLoadingAllServices', context: context);
+
+  @override
+  bool get isLoadingAllServices {
+    _$isLoadingAllServicesAtom.reportRead();
+    return super.isLoadingAllServices;
+  }
+
+  @override
+  set isLoadingAllServices(bool value) {
+    _$isLoadingAllServicesAtom.reportWrite(value, super.isLoadingAllServices,
+        () {
+      super.isLoadingAllServices = value;
+    });
+  }
+
   late final _$newVehicleServiceAtom =
       Atom(name: '_ManageServiceStore.newVehicleService', context: context);
 
@@ -45,10 +62,16 @@ mixin _$ManageServiceStore on _ManageServiceStore, Store {
       AsyncAction('_ManageServiceStore.addNewService', context: context);
 
   @override
-  Future<FunctionResponse> addNewService(String shopId, String shopName,
-      double rating, String address, LatLng shopLocation) {
-    return _$addNewServiceAsyncAction.run(() =>
-        super.addNewService(shopId, shopName, rating, address, shopLocation));
+  Future<FunctionResponse> addNewService() {
+    return _$addNewServiceAsyncAction.run(() => super.addNewService());
+  }
+
+  late final _$loadAllServicesAsyncAction =
+      AsyncAction('_ManageServiceStore.loadAllServices', context: context);
+
+  @override
+  Future<void> loadAllServices() {
+    return _$loadAllServicesAsyncAction.run(() => super.loadAllServices());
   }
 
   late final _$_ManageServiceStoreActionController =
@@ -134,6 +157,7 @@ mixin _$ManageServiceStore on _ManageServiceStore, Store {
   @override
   String toString() {
     return '''
+isLoadingAllServices: ${isLoadingAllServices},
 newVehicleService: ${newVehicleService},
 vehicleServiceList: ${vehicleServiceList}
     ''';

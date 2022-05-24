@@ -1,23 +1,30 @@
-import 'user.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'vehicle_service.dart';
 
 class ServiceRequest {
   String id;
-  User user;
+  String userId;
+  String shopId;
   PaymentMethod paymentMethod;
   DateTime dateTime;
   VehicleService vehicleService;
   bool isMobile;
   ServiceRequestStatus serviceRequestStatus;
+  LatLng userLocation;
+  LatLng shopLocation;
 
   ServiceRequest({
     required this.id,
-    required this.user,
+    required this.userId,
+    required this.shopId,
     required this.paymentMethod,
     required this.dateTime,
     required this.vehicleService,
     required this.isMobile,
     required this.serviceRequestStatus,
+    required this.userLocation,
+    required this.shopLocation,
   });
 }
 
@@ -94,4 +101,30 @@ extension ServiceRequestStatusName on ServiceRequestStatus {
     }
     return name;
   }
+}
+
+ServiceRequestStatus getServiceRequestStatusByName(String name) {
+  ServiceRequestStatus serviceRequestStatus = ServiceRequestStatus.idle;
+
+  switch (name) {
+    case 'Canceled':
+      serviceRequestStatus = ServiceRequestStatus.canceled;
+      break;
+    case 'Completed':
+      serviceRequestStatus = ServiceRequestStatus.completed;
+      break;
+    case 'Done':
+      serviceRequestStatus = ServiceRequestStatus.done;
+      break;
+    case 'Idle':
+      serviceRequestStatus = ServiceRequestStatus.idle;
+      break;
+    case 'In Progress':
+      serviceRequestStatus = ServiceRequestStatus.inprogress;
+      break;
+
+    default:
+      break;
+  }
+  return serviceRequestStatus;
 }
