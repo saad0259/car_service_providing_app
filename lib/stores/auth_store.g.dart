@@ -127,6 +127,17 @@ mixin _$AuthStore on _AuthStore, Store {
   }
 
   @override
+  void updateCnic(String newCnic) {
+    final _$actionInfo =
+        _$_AuthStoreActionController.startAction(name: '_AuthStore.updateCnic');
+    try {
+      return super.updateCnic(newCnic);
+    } finally {
+      _$_AuthStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
   String toString() {
     return '''
 newServiceShop: ${newServiceShop},

@@ -93,6 +93,24 @@ class CustomValidator {
     return null;
   }
 
+  String? pakCnic(String? value) {
+    int limit = 13;
+    if (value == null) {
+      return 'Cnic is required';
+    }
+
+    String pattern = r'(^[0-12]*$)';
+    RegExp regExp = RegExp(pattern);
+    if (value.isEmpty) {
+      return "Cnic is Required";
+    } else if (value.length != limit) {
+      return "Cnic number must $limit digits";
+    } else if (!regExp.hasMatch(value)) {
+      return "Please Enter the right format";
+    }
+    return null;
+  }
+
   String? validatePasswordLength(String? value) {
     if (value == null) {
       return 'Password can\'t be empty';

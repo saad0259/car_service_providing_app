@@ -73,22 +73,6 @@ mixin _$ProfileStore on _ProfileStore, Store {
     });
   }
 
-  late final _$serviceShopAtom =
-      Atom(name: '_ProfileStore.serviceShop', context: context);
-
-  @override
-  ServiceShop get serviceShop {
-    _$serviceShopAtom.reportRead();
-    return super.serviceShop;
-  }
-
-  @override
-  set serviceShop(ServiceShop value) {
-    _$serviceShopAtom.reportWrite(value, super.serviceShop, () {
-      super.serviceShop = value;
-    });
-  }
-
   late final _$_ProfileStoreActionController =
       ActionController(name: '_ProfileStore', context: context);
 
@@ -153,8 +137,7 @@ mixin _$ProfileStore on _ProfileStore, Store {
 shopCoverImage: ${shopCoverImage},
 shopLocation: ${shopLocation},
 shopAddress: ${shopAddress},
-currentUser: ${currentUser},
-serviceShop: ${serviceShop}
+currentUser: ${currentUser}
     ''';
   }
 }

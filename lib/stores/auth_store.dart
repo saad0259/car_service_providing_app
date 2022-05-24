@@ -19,6 +19,7 @@ abstract class _AuthStore with Store {
   ServiceShop newServiceShop = ServiceShop(
     id: '',
     name: '',
+    cnic: '',
     email: '',
     password: '',
     address: '',
@@ -41,6 +42,7 @@ abstract class _AuthStore with Store {
     newServiceShop = ServiceShop(
       id: newServiceShop.id,
       name: newServiceShop.name,
+      cnic: newServiceShop.cnic,
       email: newServiceShop.email,
       password: newServiceShop.password,
       address: newServiceShop.address,
@@ -58,6 +60,7 @@ abstract class _AuthStore with Store {
     newServiceShop = ServiceShop(
       id: newServiceShop.id,
       name: name,
+      cnic: newServiceShop.cnic,
       email: newServiceShop.email,
       password: newServiceShop.password,
       address: newServiceShop.address,
@@ -75,6 +78,7 @@ abstract class _AuthStore with Store {
     newServiceShop = ServiceShop(
       id: newServiceShop.id,
       name: newServiceShop.name,
+      cnic: newServiceShop.cnic,
       email: newServiceShop.email,
       password: newServiceShop.password,
       address: newServiceShop.address,
@@ -92,6 +96,7 @@ abstract class _AuthStore with Store {
     newServiceShop = ServiceShop(
       id: newServiceShop.id,
       name: newServiceShop.name,
+      cnic: newServiceShop.cnic,
       email: email,
       password: newServiceShop.password,
       address: newServiceShop.address,
@@ -109,6 +114,7 @@ abstract class _AuthStore with Store {
     newServiceShop = ServiceShop(
       id: newServiceShop.id,
       name: newServiceShop.name,
+      cnic: newServiceShop.cnic,
       email: newServiceShop.email,
       password: password,
       address: newServiceShop.address,
@@ -126,10 +132,29 @@ abstract class _AuthStore with Store {
     newServiceShop = ServiceShop(
       id: newServiceShop.id,
       name: newServiceShop.name,
+      cnic: newServiceShop.cnic,
       email: newServiceShop.email,
       password: newServiceShop.password,
       address: newServiceShop.address,
       phone: newphone,
+      openingTime: newServiceShop.openingTime,
+      closingTime: newServiceShop.closingTime,
+      coverImage: newServiceShop.coverImage,
+      rating: newServiceShop.rating,
+      shopLocation: newServiceShop.shopLocation,
+    );
+  }
+
+  @action
+  void updateCnic(String newCnic) {
+    newServiceShop = ServiceShop(
+      id: newServiceShop.id,
+      name: newServiceShop.name,
+      cnic: newCnic,
+      email: newServiceShop.email,
+      password: newServiceShop.password,
+      address: newServiceShop.address,
+      phone: newServiceShop.phone,
       openingTime: newServiceShop.openingTime,
       closingTime: newServiceShop.closingTime,
       coverImage: newServiceShop.coverImage,
@@ -147,6 +172,7 @@ abstract class _AuthStore with Store {
     newServiceShop = ServiceShop(
       id: '',
       name: '',
+      cnic: '',
       email: '',
       password: '',
       address: '',

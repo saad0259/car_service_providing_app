@@ -229,6 +229,22 @@ class SignupScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 20),
                                   TextFormField(
+                                    validator: _customValidator.pakCnic,
+                                    onSaved: (String? val) {
+                                      if (val == null) {
+                                        return;
+                                      }
+                                      _authStore.updateName(val);
+                                    },
+                                    keyboardType: TextInputType.text,
+                                    decoration: const InputDecoration(
+                                      label: Text('Cnic'),
+                                      prefixIcon:
+                                          Icon(Icons.domain_verification),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
+                                  TextFormField(
                                     validator: _customValidator.validateEmail,
                                     onSaved: (String? val) {
                                       if (val == null) {

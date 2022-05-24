@@ -28,21 +28,6 @@ abstract class _ProfileStore with Store {
   @observable
   ServiceShop? currentUser;
 
-  @observable
-  ServiceShop serviceShop = ServiceShop(
-    id: '123',
-    name: 'Pseudo Name',
-    email: 'abc@gmail.com',
-    password: '12345678',
-    address: 'some address',
-    phone: '30123456789',
-    openingTime: TimeOfDay.now(),
-    closingTime: TimeOfDay.now(),
-    coverImage: fullCarServiceImage,
-    rating: 3,
-    shopLocation: GoogleMapsHelper().defaultGoogleMapsLocation,
-  );
-
   @action
   void getUser() {
     currentUser = _authStore.currentUser;
@@ -68,20 +53,23 @@ abstract class _ProfileStore with Store {
   FunctionResponse updateProfile(String name) {
     FunctionResponse fResponse = getIt<FunctionResponse>();
     try {
-      serviceShop = ServiceShop(
-        id: serviceShop.id,
-        name: name,
-        email: serviceShop.email,
-        password: serviceShop.password,
-        address: serviceShop.address,
-        phone: serviceShop.phone,
-        openingTime: serviceShop.openingTime,
-        closingTime: serviceShop.closingTime,
-        coverImage: shopCoverImage,
-        rating: serviceShop.rating,
-        shopLocation: serviceShop.shopLocation,
-      );
-      fResponse.passed(message: 'Updated Profile');
+      if (currentUser != null) {
+        currentUser = ServiceShop(
+          id: currentUser!.id,
+          name: name,
+          cnic: currentUser!.cnic,
+          email: currentUser!.email,
+          password: currentUser!.password,
+          address: currentUser!.address,
+          phone: currentUser!.phone,
+          openingTime: currentUser!.openingTime,
+          closingTime: currentUser!.closingTime,
+          coverImage: shopCoverImage,
+          rating: currentUser!.rating,
+          shopLocation: currentUser!.shopLocation,
+        );
+        fResponse.passed(message: 'Updated Profile');
+      }
     } catch (e) {
       fResponse.failed(message: 'Unable to update profile : $e');
     }

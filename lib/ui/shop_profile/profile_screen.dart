@@ -54,9 +54,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _profileStore.changeShopCoverImage(_profileStore.serviceShop.coverImage);
-    _profileStore.changeShopAddress(_profileStore.serviceShop.address);
-    _profileStore.changeShopLocation(_profileStore.serviceShop.shopLocation);
+    // _profileStore.changeShopCoverImage(_profileStore.currentUser.coverImage);
+    // _profileStore.changeShopAddress(_profileStore.currentUser.address);
+    // _profileStore.changeShopLocation(_profileStore.currentUser.shopLocation);
   }
 
   //Functions
@@ -154,6 +154,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _customAlerts.showSnackBar(context, fResponse.message,
         success: fResponse.success);
   }
+
+  //todo : load user profile
 
   @override
   Widget build(BuildContext context) {

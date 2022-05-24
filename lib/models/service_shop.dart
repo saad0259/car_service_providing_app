@@ -4,6 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class ServiceShop {
   String id;
   String name;
+  String cnic;
   String email;
   String password;
   String coverImage;
@@ -16,6 +17,7 @@ class ServiceShop {
   ServiceShop({
     required this.id,
     required this.name,
+    required this.cnic,
     required this.email,
     required this.password,
     required this.address,
