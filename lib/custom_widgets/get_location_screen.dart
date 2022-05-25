@@ -1,5 +1,10 @@
+import 'package:car_service_providing_app/custom_utils/google_maps_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+import '../custom_utils/general_helper.dart';
 
 class GetLocationScreen extends StatefulWidget {
   static const routeName = '/get-location-screen';
@@ -11,12 +16,73 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
   String googleApikey = "AIzaSyDGVdifKHexYzYZjIF615HPm5e00AzqO4g";
   GoogleMapController? mapController; //contrller for Google map
   CameraPosition? cameraPosition;
-  LatLng startLocation = const LatLng(27.6602292, 85.308027);
-  LatLng location = const LatLng(27.6602292, 85.308027);
+  LatLng startLocation = GoogleMapsHelper().defaultGoogleMapsLocation;
+  LatLng responseLocation = GoogleMapsHelper().defaultGoogleMapsLocation;
+  Future<void> getCurrentUserLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      print('Location services are disabled.');
+    } else {
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          // Permissions are denied, next time you could try
+          // requesting permissions again (this is also where
+          // Android's shouldShowRequestPermissionRationale
+          // returned true. According to Android guidelines
+          // your App should show an explanatory UI now.
+          print('Location permissions are denied');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        // Permissions are denied forever, handle appropriately.
+        print(
+            'Location permissions are permanently denied, we cannot request permissions.');
+      }
+
+      // When we reach here, permissions are granted and we can
+      // continue accessing the position of the device.
+      if (permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always) {
+        Position position = await Geolocator.getCurrentPosition();
+        print(
+            'new position var : ${position.latitude} , ${position.longitude}');
+        // setState(() {
+        startLocation = LatLng(position.latitude, position.longitude);
+        print('updated Location : $startLocation');
+        // });
+        mapController?.animateCamera(CameraUpdate.newLatLng(startLocation));
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
+    //route Data handeling
+    dynamic routeData = modalRouteHandler(context);
+    final LatLng? receivedLocation = routeData['startLocation'] as LatLng?;
+
+    if (receivedLocation != null) {
+      mapController?.animateCamera(CameraUpdate.newLatLng(receivedLocation));
+    } else {
+      getCurrentUserLocation();
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: const Text("Longitude Latitude Picker in Google Map"),
@@ -25,9 +91,11 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
         body: Stack(children: [
           GoogleMap(
             //Map widget from google_maps_flutter package
-            zoomGesturesEnabled: true, //enable Zoom in, out on map
+            // zoomGesturesEnabled: true, //  enable Zoom in, out on map
             myLocationButtonEnabled: true,
             myLocationEnabled: true,
+            zoomControlsEnabled: false,
+            zoomGesturesEnabled: false,
             initialCameraPosition: CameraPosition(
               //innital position in map
               target: startLocation, //initial position
@@ -44,10 +112,10 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
               cameraPosition = cameraPositiona; //when map is dragging
             },
             onCameraIdle: () async {
-              setState(() {
-                location = LatLng(cameraPosition!.target.latitude,
-                    cameraPosition!.target.longitude);
-              });
+              // setState(() {
+              responseLocation = LatLng(cameraPosition!.target.latitude,
+                  cameraPosition!.target.longitude);
+              // });
             },
           ),
           Center(
@@ -60,37 +128,48 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
           ),
           Positioned(
               //widget to display location name
-              bottom: 100,
+              bottom: 10,
+              right: 0,
               child: Padding(
                 padding: const EdgeInsets.all(15),
                 child: Card(
                   child: Container(
-                      padding: const EdgeInsets.all(0),
-                      width: MediaQuery.of(context).size.width - 40,
-                      child: ListTile(
-                        leading: const Icon(Icons.location_on),
-                        title: Column(
-                          children: [
-                            Text(
-                              location.latitude.toStringAsFixed(5),
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                            Text(
-                              location.longitude.toStringAsFixed(5),
-                              style: const TextStyle(fontSize: 18),
-                            ),
-                          ],
-                        ),
-                        dense: true,
-                        trailing: IconButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(location);
-                            },
-                            icon: Icon(
-                              Icons.check,
-                              color: theme.colorScheme.primary,
-                            )),
-                      )),
+                    padding: const EdgeInsets.all(0),
+                    width: 100,
+
+                    // child: ListTile(
+                    //   leading: const Icon(Icons.location_on),
+                    //   title: Column(
+                    //     children: [
+                    //       Text(
+                    //         startLocation.latitude.toStringAsFixed(5),
+                    //         style: const TextStyle(fontSize: 18),
+                    //       ),
+                    //       Text(
+                    //         startLocation.longitude.toStringAsFixed(5),
+                    //         style: const TextStyle(fontSize: 18),
+                    //       ),
+                    //     ],
+                    //   ),
+                    //   dense: true,
+                    //   trailing: IconButton(
+                    //       onPressed: () {
+                    //         Navigator.of(context).pop(responseLocation);
+                    //       },
+                    //       icon: Icon(
+                    //         Icons.check,
+                    //         color: theme.colorScheme.primary,
+                    //       )),
+                    // ),
+                    child: IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(responseLocation);
+                        },
+                        icon: Icon(
+                          Icons.check,
+                          color: theme.colorScheme.primary,
+                        )),
+                  ),
                 ),
               ))
         ]));

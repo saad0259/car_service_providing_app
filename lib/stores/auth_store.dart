@@ -94,6 +94,7 @@ abstract class _AuthStore with Store {
       rating: newServiceShop.rating,
       shopLocation: location,
     );
+    print('store updated location : $location');
   }
 
   @action
