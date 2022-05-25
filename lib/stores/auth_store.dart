@@ -208,7 +208,8 @@ abstract class _AuthStore with Store {
 
     try {
       fResponse = await checkIsCnicDuplicated(newServiceShop.cnic);
-      if (fResponse.success && fResponse.data) {
+      fResponse.printResponse();
+      if (fResponse.success && !fResponse.data) {
         final UserCredential _authResult =
             await firebaseAuth.createUserWithEmailAndPassword(
                 email: newServiceShop.email, password: newServiceShop.password);
@@ -278,7 +279,7 @@ abstract class _AuthStore with Store {
       } else {
         fResponse.data = false;
       }
-      fResponse.passed(message: 'cnic check successfull');
+      fResponse.passed(message: 'cnic check successfull : ${fResponse.data}');
     } catch (e) {
       fResponse.failed(message: 'Error during checkCnicDuplication  : e');
     }

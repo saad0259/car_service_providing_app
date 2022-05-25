@@ -230,6 +230,7 @@ class SignupScreen extends StatelessWidget {
                                   const SizedBox(height: 20),
                                   TextFormField(
                                     validator: _customValidator.pakCnic,
+                                    maxLength: 13,
                                     //todo : incorporate formatter
                                     onSaved: (String? val) {
                                       if (val == null) {
