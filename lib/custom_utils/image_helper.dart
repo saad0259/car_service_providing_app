@@ -11,29 +11,28 @@ enum ImageType { network, file, asset, unknown }
 
 class CustomImageHelper {
   ImageType getImageType(String _imagePath) {
-    FunctionResponse _fResponse = getIt<FunctionResponse>();
+    FunctionResponse fResponse = getIt<FunctionResponse>();
     try {
       final String _leftSubstring = _imagePath.substring(0, 8).toLowerCase();
 
       print('Image extension : $_leftSubstring');
 
       if (_leftSubstring.contains('http')) {
-        _fResponse.data = ImageType.network;
+        fResponse.data = ImageType.network;
       } else if (_leftSubstring.contains('data')) {
-        _fResponse.data = ImageType.file;
+        fResponse.data = ImageType.file;
       } else if (_leftSubstring.contains('asset')) {
-        _fResponse.data = ImageType.asset;
+        fResponse.data = ImageType.asset;
       } else {
-        _fResponse.data = ImageType.unknown;
+        fResponse.data = ImageType.unknown;
       }
-      _fResponse.passed();
-      _fResponse.message = 'Found image type';
+      fResponse.passed(message: 'Found image type');
     } catch (e) {
-      _fResponse.failed();
-      _fResponse.message = 'Error finding image type';
+      fResponse.data = ImageType.unknown;
+      fResponse.failed(message: 'Error finding image type');
     }
 
-    return _fResponse.data;
+    return fResponse.data;
   }
 
   Future<FunctionResponse> pickUserImage(BuildContext context) async {

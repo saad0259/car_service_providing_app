@@ -230,11 +230,12 @@ class SignupScreen extends StatelessWidget {
                                   const SizedBox(height: 20),
                                   TextFormField(
                                     validator: _customValidator.pakCnic,
+                                    //todo : incorporate formatter
                                     onSaved: (String? val) {
                                       if (val == null) {
                                         return;
                                       }
-                                      _authStore.updateName(val);
+                                      _authStore.updateCnic(val);
                                     },
                                     keyboardType: TextInputType.text,
                                     decoration: const InputDecoration(

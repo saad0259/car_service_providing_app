@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -63,6 +61,7 @@ abstract class _ProfileStore with Store {
             email: data['email'],
             password: data['password'],
             address: data['address'],
+            cnic: data['cnic'] ?? '',
             phone: data['phone'],
             openingTime: data['openingTime'] ?? TimeOfDay.now(),
             closingTime: data['closingTime'] ?? TimeOfDay.now(),
