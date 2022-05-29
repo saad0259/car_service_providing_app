@@ -1,9 +1,9 @@
-import 'package:car_service_providing_app/custom_utils/google_maps_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../custom_utils/google_maps_helper.dart';
 import '../custom_utils/general_helper.dart';
 
 class GetLocationScreen extends StatefulWidget {
