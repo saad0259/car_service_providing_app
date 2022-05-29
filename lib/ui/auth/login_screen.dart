@@ -49,8 +49,8 @@ class LoginScreen extends StatelessWidget {
         fResponse = await _authStore.tryLogin(
             _formData['email'] ?? '', _formData['password'] ?? '');
       }
+      _customAlerts.popLoader(context);
     }
-    _customAlerts.popLoader(context);
 
     fResponse.printResponse();
     //show snackbar

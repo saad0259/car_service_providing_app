@@ -178,7 +178,7 @@ abstract class _ManageServiceStore with Store {
       fResponse = await _profileStore.loadProfile();
       fResponse.printResponse();
       if (fResponse.success) {
-        ServiceShop currentUser = _profileStore.currentUser!;
+        ServiceShop currentUser = _profileStore.currentUser;
 
         newVehicleService = VehicleService(
           id: DateTime.now().millisecondsSinceEpoch.toString(),

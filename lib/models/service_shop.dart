@@ -11,8 +11,8 @@ class ServiceShop {
   double rating;
   String address;
   String phone;
-  TimeOfDay openingTime;
-  TimeOfDay closingTime;
+  // TimeOfDay openingTime;
+  // TimeOfDay closingTime;
   LatLng shopLocation;
   ServiceShop({
     required this.id,
@@ -22,8 +22,8 @@ class ServiceShop {
     required this.password,
     required this.address,
     required this.phone,
-    required this.openingTime,
-    required this.closingTime,
+    // required this.openingTime,
+    // required this.closingTime,
     required this.coverImage,
     required this.rating,
     required this.shopLocation,

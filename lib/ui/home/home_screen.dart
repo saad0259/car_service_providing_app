@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
   //Stores
   final ManageServiceStore _manageServiceStore = getIt<ManageServiceStore>();
   final ProfileStore _profileStore = getIt<ProfileStore>();
-  final HomeScreenStore _homeScreenStore = getIt<HomeScreenStore>();
+  // final HomeScreenStore _homeScreenStore = getIt<HomeScreenStore>();
   final ServiceRequestStore _serviceRequestStore = getIt<ServiceRequestStore>();
 
   //Utilities
@@ -46,7 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    _homeScreenStore.loadAllData();
+    _profileStore.loadProfile();
 
     super.initState();
   }
@@ -87,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return SafeArea(
       child: Observer(builder: (_) {
-        return _homeScreenStore.isLoadingHomeScreenData
+        return _profileStore.isLoading
             ? const Scaffold(
                 body: Center(
                   child: CircularProgressIndicator.adaptive(),
@@ -95,15 +95,15 @@ class _HomeScreenState extends State<HomeScreen> {
               )
             : Scaffold(
                 appBar: AppBar(
-                  title: Text(_homeScreenStore.currentUser.name),
+                  title: Text(_profileStore.currentUser.name),
                   actions: [
                     IconButton(
-                        onPressed: true
-                            ? null
-                            : () {
-                                Navigator.of(context)
-                                    .pushNamed(ProfileScreen.routeName);
-                              },
+                        onPressed: () {
+                          _profileStore
+                              .updateCurrentUser(_profileStore.currentUser);
+                          Navigator.of(context)
+                              .pushNamed(ProfileScreen.routeName);
+                        },
                         icon: const Icon(Icons.edit)),
                     IconButton(
                         onPressed: () async {
@@ -122,8 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             // height: 200,
                             child: SizedBox(
                               height: screenWidth * 0.65,
-                              child: buildImage(theme,
-                                  _homeScreenStore.currentUser.coverImage),
+                              child: buildImage(
+                                  theme, _profileStore.currentUser.coverImage),
                             ),
                           ),
                         ],
@@ -137,28 +137,28 @@ class _HomeScreenState extends State<HomeScreen> {
                             Row(
                               children: [
                                 Text(
-                                  _homeScreenStore.currentUser.name,
+                                  _profileStore.currentUser.name,
                                   style: theme.textTheme.headline3,
                                 ),
                                 const Expanded(child: SizedBox()),
                                 IconButton(
                                     tooltip:
-                                        '${_homeScreenStore.currentUser.shopLocation.latitude.toStringAsFixed(3)}, ${_homeScreenStore.currentUser.shopLocation.longitude.toStringAsFixed(3)}',
+                                        '${_profileStore.currentUser.shopLocation.latitude.toStringAsFixed(3)}, ${_profileStore.currentUser.shopLocation.longitude.toStringAsFixed(3)}',
                                     onPressed: () async {
                                       await _googleMapsHelper.openMap(
-                                          _homeScreenStore.currentUser
-                                              .shopLocation.latitude,
-                                          _homeScreenStore.currentUser
-                                              .shopLocation.longitude);
+                                          _profileStore.currentUser.shopLocation
+                                              .latitude,
+                                          _profileStore.currentUser.shopLocation
+                                              .longitude);
                                     },
                                     icon: const Icon(Icons.location_on_sharp)),
                                 const SizedBox(width: 10),
                                 IconButton(
                                     tooltip:
-                                        '+92${_homeScreenStore.currentUser.phone}',
+                                        '+92${_profileStore.currentUser.phone}',
                                     onPressed: () {
                                       launchUrl(Uri.parse(
-                                          "tel://+92${_homeScreenStore.currentUser.phone}"));
+                                          "tel://+92${_profileStore.currentUser.phone}"));
                                     },
                                     icon: const Icon(Icons.phone)),
                               ],
@@ -170,7 +170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(1.0),
                                     child: Text(
-                                      _homeScreenStore.currentUser.address,
+                                      _profileStore.currentUser.address,
                                       softWrap: true,
                                       style: theme.textTheme.headline6,
                                     ),
@@ -184,7 +184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           MainAxisAlignment.center,
                                       children: [
                                         Text(
-                                          _homeScreenStore.currentUser.rating
+                                          _profileStore.currentUser.rating
                                               .toString(),
                                           style: theme.textTheme.headline6,
                                         ),

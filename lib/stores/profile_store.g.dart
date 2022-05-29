@@ -6,7 +6,7 @@ part of 'profile_store.dart';
 // StoreGenerator
 // **************************************************************************
 
-// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic
+// ignore_for_file: non_constant_identifier_names, unnecessary_brace_in_string_interps, unnecessary_lambdas, prefer_expression_function_bodies, lines_longer_than_80_chars, avoid_as, avoid_annotating_with_dynamic, no_leading_underscores_for_local_identifiers
 
 mixin _$ProfileStore on _ProfileStore, Store {
   late final _$shopCoverImageAtom =
@@ -61,13 +61,13 @@ mixin _$ProfileStore on _ProfileStore, Store {
       Atom(name: '_ProfileStore.currentUser', context: context);
 
   @override
-  ServiceShop? get currentUser {
+  ServiceShop get currentUser {
     _$currentUserAtom.reportRead();
     return super.currentUser;
   }
 
   @override
-  set currentUser(ServiceShop? value) {
+  set currentUser(ServiceShop value) {
     _$currentUserAtom.reportWrite(value, super.currentUser, () {
       super.currentUser = value;
     });
@@ -81,48 +81,78 @@ mixin _$ProfileStore on _ProfileStore, Store {
     return _$loadProfileAsyncAction.run(() => super.loadProfile());
   }
 
+  late final _$updateProfileAsyncAction =
+      AsyncAction('_ProfileStore.updateProfile', context: context);
+
+  @override
+  Future<FunctionResponse> updateProfile() {
+    return _$updateProfileAsyncAction.run(() => super.updateProfile());
+  }
+
   late final _$_ProfileStoreActionController =
       ActionController(name: '_ProfileStore', context: context);
 
   @override
-  void getUser() {
+  void updateCurrentUser(ServiceShop serviceShop) {
     final _$actionInfo = _$_ProfileStoreActionController.startAction(
-        name: '_ProfileStore.getUser');
+        name: '_ProfileStore.updateCurrentUser');
     try {
-      return super.getUser();
+      return super.updateCurrentUser(serviceShop);
     } finally {
       _$_ProfileStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void changeShopCoverImage(String image) {
+  void updateName(String newName) {
     final _$actionInfo = _$_ProfileStoreActionController.startAction(
-        name: '_ProfileStore.changeShopCoverImage');
+        name: '_ProfileStore.updateName');
     try {
-      return super.changeShopCoverImage(image);
+      return super.updateName(newName);
     } finally {
       _$_ProfileStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void changeShopLocation(LatLng location) {
+  void updatePhone(String newPhone) {
     final _$actionInfo = _$_ProfileStoreActionController.startAction(
-        name: '_ProfileStore.changeShopLocation');
+        name: '_ProfileStore.updatePhone');
     try {
-      return super.changeShopLocation(location);
+      return super.updatePhone(newPhone);
     } finally {
       _$_ProfileStoreActionController.endAction(_$actionInfo);
     }
   }
 
   @override
-  void changeShopAddress(String address) {
+  void updateLocation(LatLng newLocation) {
     final _$actionInfo = _$_ProfileStoreActionController.startAction(
-        name: '_ProfileStore.changeShopAddress');
+        name: '_ProfileStore.updateLocation');
     try {
-      return super.changeShopAddress(address);
+      return super.updateLocation(newLocation);
+    } finally {
+      _$_ProfileStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateCoverImage(String newImage) {
+    final _$actionInfo = _$_ProfileStoreActionController.startAction(
+        name: '_ProfileStore.updateCoverImage');
+    try {
+      return super.updateCoverImage(newImage);
+    } finally {
+      _$_ProfileStoreActionController.endAction(_$actionInfo);
+    }
+  }
+
+  @override
+  void updateAddress(String newAddress) {
+    final _$actionInfo = _$_ProfileStoreActionController.startAction(
+        name: '_ProfileStore.updateAddress');
+    try {
+      return super.updateAddress(newAddress);
     } finally {
       _$_ProfileStoreActionController.endAction(_$actionInfo);
     }

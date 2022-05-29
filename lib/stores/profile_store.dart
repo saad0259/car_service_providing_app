@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:mobx/mobx.dart';
 import '../constants/firebase_constants.dart';
 import '../custom_utils/function_response.dart';
 import '../custom_utils/google_maps_helper.dart';
+import '../custom_utils/image_helper.dart';
 import '../models/service_shop.dart';
 import '../resources/app_images.dart';
 import '../service_locator.dart';
@@ -18,8 +21,10 @@ part 'profile_store.g.dart';
 class ProfileStore = _ProfileStore with _$ProfileStore;
 
 abstract class _ProfileStore with Store {
-  _ProfileStore(this._authStore);
+  _ProfileStore(this._authStore, this._customImageHelper);
   final AuthStore _authStore;
+  final CustomImageHelper _customImageHelper;
+  bool isLoading = false;
 
   @observable
   String shopCoverImage = '';
@@ -28,17 +33,34 @@ abstract class _ProfileStore with Store {
   @observable
   String shopAddress = '';
   @observable
-  ServiceShop? currentUser;
+  ServiceShop currentUser = ServiceShop(
+    id: '',
+    name: '',
+    email: '',
+    cnic: '',
+    password: '',
+    address: '',
+    phone: '',
+    // openingTime: TimeOfDay.now(),
+    // closingTime: TimeOfDay.now(),
+    coverImage: '',
+    rating: 0,
+    shopLocation: GoogleMapsHelper().defaultGoogleMapsLocation,
+  );
 
   @action
-  void getUser() {
-    // currentUser = _authStore.currentUser;
-    print('name : ${currentUser?.name}');
+  void updateCurrentUser(ServiceShop serviceShop) {
+    currentUser = serviceShop;
+  }
+
+  void toggleIsLoading() {
+    isLoading = isLoading;
   }
 
   @action
   Future<FunctionResponse> loadProfile() async {
     FunctionResponse fResponse = getIt<FunctionResponse>();
+    toggleIsLoading();
     try {
       var data;
       final User? user = firebaseAuth.currentUser;
@@ -63,8 +85,8 @@ abstract class _ProfileStore with Store {
             address: data['address'],
             cnic: data['cnic'] ?? '',
             phone: data['phone'],
-            openingTime: data['openingTime'] ?? TimeOfDay.now(),
-            closingTime: data['closingTime'] ?? TimeOfDay.now(),
+            // openingTime: data['openingTime'] ?? TimeOfDay.now(),
+            // closingTime: data['closingTime'] ?? TimeOfDay.now(),
             coverImage: data['coverImage'] ?? '',
             rating: data['rating'] ?? 0,
             shopLocation: shopLocation,
@@ -77,23 +99,140 @@ abstract class _ProfileStore with Store {
     } catch (e) {
       fResponse.failed(message: 'Error loading profile : $e');
     }
+    toggleIsLoading();
 
     return fResponse;
   }
 
   @action
-  void changeShopCoverImage(String image) {
-    shopCoverImage = image;
+  Future<FunctionResponse> updateProfile() async {
+    FunctionResponse fResponse = getIt<FunctionResponse>();
+    try {
+      final User? user = firebaseAuth.currentUser;
+      if (user != null) {
+        fResponse = await _customImageHelper.uploadPicture(
+            (currentUser.coverImage), serviceShopImagesDirectory);
+        if (fResponse.success) {
+          updateCoverImage(fResponse.data);
+          log('new name : ${currentUser.name}');
+          log('new phone : ${currentUser.phone}');
+          log('new address : ${currentUser.address}');
+          log('new location : ${currentUser.shopLocation.latitude.toStringAsFixed(4)} ${currentUser.shopLocation.longitude.toStringAsFixed(4)}');
+
+          await firestoreShopsCollection.doc(user.uid).update({
+            'name': currentUser.name,
+            'email': currentUser.email,
+            'password': currentUser.password,
+            'address': currentUser.address,
+            'cnic': currentUser.cnic,
+            'phone': currentUser.phone,
+            // 'openingTime': currentUser.openingTime,
+            // 'closingTime': currentUser.closingTime,
+            'coverImage': currentUser.coverImage,
+            'rating': currentUser.rating,
+            'shopLocation': GeoPoint(currentUser.shopLocation.latitude,
+                currentUser.shopLocation.longitude),
+          });
+          fResponse.passed(message: 'Profile Updated');
+        }
+      } else {
+        fResponse.failed(message: 'Current user not found');
+      }
+    } catch (e) {
+      fResponse.failed(message: 'Error updating profile : $e');
+    }
+
+    return fResponse;
   }
 
   @action
-  void changeShopLocation(LatLng location) {
-    shopLocation = location;
+  void updateName(String newName) {
+    currentUser = ServiceShop(
+      id: currentUser.id,
+      name: newName,
+      cnic: currentUser.cnic,
+      email: currentUser.email,
+      password: currentUser.password,
+      address: currentUser.address,
+      phone: currentUser.phone,
+      // openingTime: currentUser.openingTime,
+      // closingTime: currentUser.closingTime,
+      coverImage: currentUser.coverImage,
+      rating: currentUser.rating,
+      shopLocation: currentUser.shopLocation,
+    );
   }
 
   @action
-  void changeShopAddress(String address) {
-    shopAddress = address;
+  void updatePhone(String newPhone) {
+    currentUser = ServiceShop(
+      id: currentUser.id,
+      name: currentUser.name,
+      cnic: currentUser.cnic,
+      email: currentUser.email,
+      password: currentUser.password,
+      address: currentUser.address,
+      phone: newPhone,
+      // openingTime: currentUser.openingTime,
+      // closingTime: currentUser.closingTime,
+      coverImage: currentUser.coverImage,
+      rating: currentUser.rating,
+      shopLocation: currentUser.shopLocation,
+    );
+  }
+
+  @action
+  void updateLocation(LatLng newLocation) {
+    currentUser = ServiceShop(
+      id: currentUser.id,
+      name: currentUser.name,
+      cnic: currentUser.cnic,
+      email: currentUser.email,
+      password: currentUser.password,
+      address: currentUser.address,
+      phone: currentUser.phone,
+      // openingTime: currentUser.openingTime,
+      // closingTime: currentUser.closingTime,
+      coverImage: currentUser.coverImage,
+      rating: currentUser.rating,
+      shopLocation: newLocation,
+    );
+  }
+
+  @action
+  void updateCoverImage(String newImage) {
+    currentUser = ServiceShop(
+      id: currentUser.id,
+      name: currentUser.name,
+      cnic: currentUser.cnic,
+      email: currentUser.email,
+      password: currentUser.password,
+      address: currentUser.address,
+      phone: currentUser.phone,
+      // openingTime: currentUser.openingTime,
+      // closingTime: currentUser.closingTime,
+      coverImage: newImage,
+      rating: currentUser.rating,
+      shopLocation: currentUser.shopLocation,
+    );
+  }
+
+  @action
+  void updateAddress(String newAddress) {
+    currentUser = ServiceShop(
+      id: currentUser.id,
+      name: currentUser.name,
+      cnic: currentUser.cnic,
+      email: currentUser.email,
+      password: currentUser.password,
+      address: newAddress,
+      phone: currentUser.phone,
+      // openingTime: currentUser.openingTime,
+      // closingTime: currentUser.closingTime,
+      coverImage: currentUser.coverImage,
+      rating: currentUser.rating,
+      shopLocation: currentUser.shopLocation,
+    );
   }
 
   // @action

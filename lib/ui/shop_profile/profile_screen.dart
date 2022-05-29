@@ -11,25 +11,20 @@ import '../../custom_utils/google_maps_helper.dart';
 import '../../custom_utils/image_helper.dart';
 import '../../custom_widgets/custom_wrappers.dart';
 import '../../custom_widgets/get_location_screen.dart';
+import '../../models/service_shop.dart';
 import '../../resources/app_images.dart';
 import '../../service_locator.dart';
-import '../../stores/auth_store.dart';
-import '../../stores/manage_service_store.dart';
 import '../../stores/profile_store.dart';
 import '../../theme/my_app_colors.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+class ProfileScreen extends StatelessWidget {
+  ProfileScreen({Key? key}) : super(key: key);
   static const routeName = '/profile-screen';
 
-  @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
-}
-
-class _ProfileScreenState extends State<ProfileScreen> {
   //Form
   final _formKey = GlobalKey<FormState>();
   String name = '';
+  final TextEditingController _locationController = TextEditingController();
 
   //Theme
   final AppColors _appColors = getIt<AppColors>();
@@ -48,15 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   //Stores
   final ProfileStore _profileStore = getIt<ProfileStore>();
-  final AuthStore _authStore = getIt<AuthStore>();
-
-  @override
-  void initState() {
-    super.initState();
-    // _profileStore.changeShopCoverImage(_profileStore.serviceShop.coverImage);
-    // _profileStore.changeShopAddress(_profileStore.serviceShop.address);
-    // _profileStore.changeShopLocation(_profileStore.serviceShop.shopLocation);
-  }
+  // final AuthStore _profileStore = getIt<AuthStore>();
 
   //Functions
   Future<void> changeCoverImage(BuildContext context) async {
@@ -68,7 +55,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       fResponse = await _customImageHelper.pickUserImage(context);
 
       if (fResponse.success) {
-        _profileStore.changeShopCoverImage(fResponse.data);
+        _profileStore.updateCoverImage(fResponse.data);
         fResponse.passed(message: 'Uploaded new Image');
       }
       _customAlerts.popLoader(context);
@@ -77,12 +64,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> addNewService(BuildContext context) async {
+  Future<void> updateProfile(BuildContext context) async {
     FunctionResponse fResponse = getIt<FunctionResponse>();
 
     if (!_formKey.currentState!.validate()) {
       fResponse.failed(message: 'Please enter valid inputs');
-    } else if (_profileStore.shopCoverImage.isEmpty) {
+    } else if (_profileStore.currentUser.coverImage.isEmpty) {
       fResponse.failed(message: 'Please add a cover image');
     } else {
       _customFormHelper.unfocusFormFields(context);
@@ -90,7 +77,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _customAlerts.showLoaderDialog(context);
       fResponse = await _connectivityHelper.checkInternetConnection();
       if (fResponse.success) {
-        // fResponse = _profileStore.updateProfile(name);
+        fResponse = await _profileStore.updateProfile();
       }
       _customAlerts.popLoader(context);
     }
@@ -105,27 +92,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Future<void> changeUserLatLng(BuildContext context) async {
-    FunctionResponse fResponse = getIt<FunctionResponse>();
-
-    try {
-      // _customAlerts.showLoaderDialog(context);
-
-      // fResponse = _googleMapsHelper.showPlacePicker(context);
-
-      if (fResponse.success) {
-        // final PickResult pickResult = fResponse.data;
-        // fResponse =
-        // _profileStore.changeShopLocation(LatLng(
-        //     pickResult.geometry!.location.lat,
-        //     pickResult.geometry!.location.lng));
-      }
-      // _customAlerts.popLoader(context);
-    } catch (e) {
-      fResponse.failed(message: 'Unable to change user LatLng : $e');
-    }
-  }
-
   Future<void> getLocation(context) async {
     FunctionResponse fResponse = getIt<FunctionResponse>();
 
@@ -134,11 +100,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       fResponse = await _connectivityHelper.checkInternetConnection();
 
       if (fResponse.success) {
-        final LatLng? newLocation = await Navigator.of(context)
-            .pushNamed(GetLocationScreen.routeName) as LatLng;
+        final LatLng? newLocation = await Navigator.of(context).pushNamed(
+            GetLocationScreen.routeName,
+            arguments: {'startLocation': _profileStore.shopLocation}) as LatLng;
         print('recieved : $newLocation');
         if (newLocation != null) {
-          _authStore.updateLocation(newLocation);
+          _profileStore.updateLocation(newLocation);
+          _locationController.text =
+              '${_profileStore.shopLocation.latitude.toStringAsFixed(5)},  ${_profileStore.shopLocation.longitude.toStringAsFixed(5)}';
           print('updated location');
           fResponse.passed(message: 'Location Updated');
         }
@@ -154,24 +123,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
         success: fResponse.success);
   }
 
-  //todo : load user profile
-
   @override
   Widget build(BuildContext context) {
     //ThemeData & constraints
     ThemeData theme = Theme.of(context);
     final double screenHeight = MediaQuery.of(context).size.height;
     final double screenWidth = MediaQuery.of(context).size.width;
+
+    ServiceShop currentUser = _profileStore.currentUser;
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(),
         backgroundColor: _appColors.loginScaffoldColor,
         body: SingleChildScrollView(
-          child: Container(
+          child: SizedBox(
             height: screenHeight * 1.5,
             width: screenWidth,
             child: Stack(
-              // clipBehavior: Clip.antiAliasWithSaveLayer,
               children: [
                 Positioned(
                   top: 0,
@@ -230,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Observer(builder: (_) {
                                           return customContainer(
                                               height: 150,
-                                              child: _authStore.newServiceShop
+                                              child: currentUser
                                                       .coverImage.isEmpty
                                                   ? Column(
                                                       mainAxisAlignment:
@@ -248,23 +217,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                             size: 70,
                                                           )
                                                         ])
-                                                  : buildImage(
-                                                      theme,
-                                                      _authStore.newServiceShop
-                                                          .coverImage));
+                                                  : buildImage(theme,
+                                                      currentUser.coverImage));
                                         }),
                                       )),
                                     ],
                                   ),
                                   const SizedBox(height: 20),
                                   TextFormField(
+                                    initialValue: currentUser.name,
                                     validator:
-                                        _customValidator.validateAlphaNmeric,
+                                        _customValidator.nonNullableString,
                                     onSaved: (String? val) {
                                       if (val == null) {
                                         return;
                                       }
-                                      _authStore.updateName(val);
+                                      _profileStore.updateName(val);
                                     },
                                     keyboardType: TextInputType.text,
                                     decoration: const InputDecoration(
@@ -272,63 +240,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       prefixIcon: Icon(Icons.person),
                                     ),
                                   ),
+
                                   const SizedBox(height: 20),
+
                                   TextFormField(
-                                    validator: _customValidator.validateEmail,
-                                    onSaved: (String? val) {
-                                      if (val == null) {
-                                        return;
-                                      }
-                                      _authStore.updateEmail(val);
-                                    },
-                                    keyboardType: TextInputType.emailAddress,
-                                    decoration: const InputDecoration(
-                                      label: Text('Email'),
-                                      prefixIcon: Icon(Icons.email),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  TextFormField(
-                                    validator:
-                                        _customValidator.nonNullableString,
-                                    onSaved: (String? val) {
-                                      if (val == null) {
-                                        return;
-                                      }
-                                      _authStore.updatePassword(val);
-                                    },
-                                    maxLength: 10,
-                                    obscureText: true,
-                                    keyboardType: TextInputType.text,
-                                    decoration: const InputDecoration(
-                                      label: Text('Password'),
-                                      prefixIcon: Icon(Icons.lock),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 20),
-                                  TextFormField(
+                                    initialValue: currentUser.phone,
                                     validator: _customValidator.phone,
                                     onSaved: (String? val) {
                                       if (val == null) {
                                         return;
                                       }
-                                      _authStore.updatePassword(val);
+                                      _profileStore.updatePhone(val);
                                     },
                                     keyboardType: TextInputType.text,
+                                    maxLength: 10,
                                     decoration: const InputDecoration(
                                       label: Text('+92'),
                                       prefixIcon: Icon(Icons.lock),
                                     ),
                                   ),
                                   const SizedBox(height: 20),
+                                  TextFormField(
+                                    initialValue: currentUser.address,
+                                    validator:
+                                        _customValidator.nonNullableString,
+                                    onSaved: (String? val) {
+                                      if (val == null) {
+                                        return;
+                                      }
+                                      _profileStore.updateAddress(val);
+                                    },
+                                    keyboardType: TextInputType.text,
+                                    decoration: const InputDecoration(
+                                      label: Text('Address'),
+                                      prefixIcon: Icon(Icons.lock),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 20),
 
                                   Observer(builder: (_) {
-                                    return TextFormField(
+                                    print(
+                                        ' observer recieved location :${_profileStore.shopLocation}');
+                                    return TextField(
                                       readOnly: true,
-                                      validator:
-                                          _customValidator.nonNullableString,
-                                      initialValue:
-                                          ' ${_authStore.newServiceShop.shopLocation.latitude.toStringAsFixed(5)} ${_authStore.newServiceShop.shopLocation.longitude.toStringAsFixed(5)} ',
+                                      controller: _locationController,
                                       decoration: InputDecoration(
                                           label: const Text('Location'),
                                           prefixIcon:
@@ -347,9 +302,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Expanded(
                                         child: ElevatedButton(
                                             onPressed: () async {
-                                              // await signup(context);
+                                              await updateProfile(context);
                                             },
-                                            child: const Text('Register')),
+                                            child: const Text('Update')),
                                       ),
                                     ],
                                   ),

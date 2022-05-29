@@ -56,11 +56,11 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
         Position position = await Geolocator.getCurrentPosition();
         print(
             'new position var : ${position.latitude} , ${position.longitude}');
-        // setState(() {
-        startLocation = LatLng(position.latitude, position.longitude);
-        print('updated Location : $startLocation');
-        // });
-        mapController?.animateCamera(CameraUpdate.newLatLng(startLocation));
+        setState(() {
+          startLocation = LatLng(position.latitude, position.longitude);
+          print('updated Location : $startLocation');
+          mapController?.animateCamera(CameraUpdate.newLatLng(startLocation));
+        });
       }
     }
   }
@@ -85,7 +85,7 @@ class _GetLocationScreenState extends State<GetLocationScreen> {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text("Longitude Latitude Picker in Google Map"),
+          title: const Text("Google Maps"),
           backgroundColor: Colors.deepPurpleAccent,
         ),
         body: Stack(children: [
