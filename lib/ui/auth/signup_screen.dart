@@ -158,7 +158,7 @@ class SignupScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(18.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                          child: customContainer(
+                          child: customCard(
                             padding: const EdgeInsets.all(15.0),
                             child: Form(
                               key: _formKey,
@@ -188,7 +188,7 @@ class SignupScreen extends StatelessWidget {
                                           await changeCoverImage(context);
                                         },
                                         child: Observer(builder: (_) {
-                                          return customContainer(
+                                          return customCard(
                                               height: 150,
                                               child: _authStore.newServiceShop
                                                       .coverImage.isEmpty

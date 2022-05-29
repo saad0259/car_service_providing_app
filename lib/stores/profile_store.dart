@@ -72,10 +72,10 @@ abstract class _ProfileStore with Store {
 
           print(' Data from FireBase ${data.toString()}');
           LatLng shopLocation = GoogleMapsHelper().defaultGoogleMapsLocation;
-          if (data['shopLocation'] == null) {
-            final GeoPoint dbLocation = data['shopLocation'] as GeoPoint;
-            shopLocation = LatLng(dbLocation.latitude, dbLocation.longitude);
-          }
+          final GeoPoint dbLocation = data['shopLocation'] as GeoPoint;
+          shopLocation = LatLng(dbLocation.latitude, dbLocation.longitude);
+          log('new shop Location ${shopLocation.longitude}');
+
           print('after getting location');
           currentUser = ServiceShop(
             id: user.uid,
@@ -110,28 +110,40 @@ abstract class _ProfileStore with Store {
     try {
       final User? user = firebaseAuth.currentUser;
       if (user != null) {
-        fResponse = await _customImageHelper.uploadPicture(
-            (currentUser.coverImage), serviceShopImagesDirectory);
-        if (fResponse.success) {
+        if ((_customImageHelper.getImageType(currentUser.coverImage)) ==
+            ImageType.network) {
+          fResponse.passed();
+        } else {
+          fResponse = await _customImageHelper.uploadPicture(
+              (currentUser.coverImage), serviceShopImagesDirectory);
           updateCoverImage(fResponse.data);
-          log('new name : ${currentUser.name}');
-          log('new phone : ${currentUser.phone}');
-          log('new address : ${currentUser.address}');
-          log('new location : ${currentUser.shopLocation.latitude.toStringAsFixed(4)} ${currentUser.shopLocation.longitude.toStringAsFixed(4)}');
+        }
+        log('before call');
+        log('before upload');
+        log('new name : ${currentUser.name}');
+        log('new phone : ${currentUser.phone}');
+        log('new address : ${currentUser.address}');
+        log('new location : ${currentUser.shopLocation.latitude.toStringAsFixed(4)} ${currentUser.shopLocation.longitude.toStringAsFixed(4)}');
+        if (fResponse.success) {
+          log(currentUser.toString());
 
+          WriteBatch batch = firebaseFirestore.batch();
           await firestoreShopsCollection.doc(user.uid).update({
             'name': currentUser.name,
-            'email': currentUser.email,
-            'password': currentUser.password,
             'address': currentUser.address,
-            'cnic': currentUser.cnic,
-            'phone': currentUser.phone,
-            // 'openingTime': currentUser.openingTime,
-            // 'closingTime': currentUser.closingTime,
             'coverImage': currentUser.coverImage,
-            'rating': currentUser.rating,
             'shopLocation': GeoPoint(currentUser.shopLocation.latitude,
                 currentUser.shopLocation.longitude),
+          });
+          DocumentReference services =
+              await firestoreOrdersCollection.doc('shopId');
+          batch.update(services, {
+            'shopLocation': GeoPoint(currentUser.shopLocation.latitude,
+                currentUser.shopLocation.longitude)
+          });
+          // Commit the batch
+          batch.commit().then((_) {
+            // ...
           });
           fResponse.passed(message: 'Profile Updated');
         }

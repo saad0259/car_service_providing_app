@@ -7,7 +7,7 @@
     <!-- Internet Permission -->
     <uses-permission android:name="android.permission.INTERNET" />
    <application
-        android:label="car_service_providing_app"
+        android:label="Sercice Vendor"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

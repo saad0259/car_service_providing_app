@@ -120,7 +120,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                   style: theme.textTheme.headline2,
                 ),
                 const SizedBox(height: 10),
-                customContainer(
+                customCard(
                     child: Form(
                   key: _formKey,
                   child: Padding(
@@ -139,7 +139,7 @@ class _AddServiceScreenState extends State<AddServiceScreen> {
                                   await changeCoverImage(context);
                                 },
                                 child: Observer(builder: (_) {
-                                  return customContainer(
+                                  return customCard(
                                       height: 150,
                                       child: _manageServiceStore
                                               .newVehicleService

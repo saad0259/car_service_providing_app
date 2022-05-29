@@ -32,7 +32,7 @@ class CustomImageHelper {
       fResponse.failed(message: 'Error finding image type');
     }
 
-    return fResponse.data;
+    return fResponse.data ?? ImageType.unknown;
   }
 
   Future<FunctionResponse> pickUserImage(BuildContext context) async {

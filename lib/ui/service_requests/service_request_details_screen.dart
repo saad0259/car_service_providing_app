@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import '../../custom_utils/connectivity_helper.dart';
 import '../../custom_utils/custom_alerts.dart';
 import '../../custom_utils/function_response.dart';
+import '../../custom_utils/google_maps_helper.dart';
 import '../../custom_widgets/custom_wrappers.dart';
 import '../../models/service_request.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,7 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
   //Custom Utils
   final CustomAlerts _customAlerts = getIt<CustomAlerts>();
   final ConnectivityHelper _connectivityHelper = getIt<ConnectivityHelper>();
+  final GoogleMapsHelper _googleMapsHelper = getIt<GoogleMapsHelper>();
 
   //Stores
   final ServiceRequestStore _serviceRequestStore = getIt<ServiceRequestStore>();
@@ -69,7 +71,7 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                customContainer(
+                customCard(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
@@ -84,12 +86,25 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
                           serviceRequest.isMobile
                               ? 'Mobile Service'
                               : ' Normal Booking'),
-                      _customListItem(theme, 'Shop Name',
-                          serviceRequest.vehicleService.shopName),
+                      _customListItem(theme, 'Phone',
+                          serviceRequest.serviceRequestStatus.getName()),
+                      _customListItem(theme, 'Payment Method',
+                          serviceRequest.paymentMethod.getName()),
                       _customListItem(theme, 'Cost',
                           serviceRequest.vehicleService.cost.toString()),
                       _customListItem(theme, 'Status',
                           serviceRequest.serviceRequestStatus.getName()),
+                      _customIconListItem(
+                          theme,
+                          'User Location',
+                          InkWell(
+                            onTap: () async {
+                              await _googleMapsHelper.openMap(
+                                  serviceRequest.userLocation.latitude,
+                                  serviceRequest.userLocation.longitude);
+                            },
+                            child: const Icon(Icons.location_on),
+                          ))
                     ],
                   ),
                 ),
@@ -134,7 +149,7 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
                                   serviceRequest.id,
                                   ServiceRequestStatus.canceled);
                             },
-                            child: Text('Cancel'),
+                            child: const Text('Cancel'),
                           ))
                         ],
                       )
@@ -144,6 +159,37 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _customIconListItem(ThemeData theme, String key, Widget iconWidget) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      key,
+                      style: theme.textTheme.headline5,
+                      softWrap: false,
+                      overflow: TextOverflow.visible,
+                    ),
+                  ),
+                  const Expanded(
+                    child: SizedBox(),
+                  ),
+                  Expanded(flex: 2, child: iconWidget),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const Divider(),
+      ],
     );
   }
 
@@ -164,8 +210,8 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
                       overflow: TextOverflow.visible,
                     ),
                   ),
-                  Expanded(
-                    child: SizedBox(),
+                  const Expanded(
+                    child: const SizedBox(),
                   ),
                   Expanded(
                     flex: 2,

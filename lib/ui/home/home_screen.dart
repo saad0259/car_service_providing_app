@@ -256,7 +256,7 @@ class _BookingStatsState extends State<BookingStats> {
 //Stores
   @override
   Widget build(BuildContext context) {
-    return customContainer(
+    return customCard(
         height: 50,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -525,7 +525,7 @@ Widget _carWashServices(BuildContext context, ThemeData theme,
                           .map((element) => customImageBox(
                                 screenWidth * 0.4,
                                 theme,
-                                key: ValueKey(element.id),
+                                key: ValueKey(element.id + element.description),
                                 image: element.coverImage,
                                 title: element.serviceName,
                                 price: element.cost,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -167,7 +169,7 @@ class ProfileScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(18.0),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                          child: customContainer(
+                          child: customCard(
                             padding: const EdgeInsets.all(15.0),
                             child: Form(
                               key: _formKey,
@@ -197,7 +199,7 @@ class ProfileScreen extends StatelessWidget {
                                           await changeCoverImage(context);
                                         },
                                         child: Observer(builder: (_) {
-                                          return customContainer(
+                                          return customCard(
                                               height: 150,
                                               child: currentUser
                                                       .coverImage.isEmpty

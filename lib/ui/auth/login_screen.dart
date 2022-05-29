@@ -91,7 +91,7 @@ class LoginScreen extends StatelessWidget {
                 child: Center(
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(20),
-                    child: customContainer(
+                    child: customCard(
                       padding: const EdgeInsets.all(15.0),
                       child: Form(
                         key: _formKey,
