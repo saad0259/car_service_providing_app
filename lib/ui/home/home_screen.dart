@@ -98,8 +98,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   title: Text(_homeScreenStore.currentUser.name),
                   actions: [
                     IconButton(
-                        onPressed: () => Navigator.of(context)
-                            .pushNamed(ProfileScreen.routeName),
+                        onPressed: true
+                            ? null
+                            : () {
+                                Navigator.of(context)
+                                    .pushNamed(ProfileScreen.routeName);
+                              },
                         icon: const Icon(Icons.edit)),
                     IconButton(
                         onPressed: () async {

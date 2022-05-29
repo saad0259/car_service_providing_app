@@ -55,21 +55,49 @@ class _ServiceRequestListScreenState extends State<ServiceRequestListScreen> {
                       await _serviceRequestStore.loadAllServiceRequests();
                     },
                     child: ListView.builder(
-                      itemCount: _serviceRequestStore.serviceRequestList
-                              .where((element) =>
-                                  element.serviceRequestStatus ==
-                                  ServiceRequestStatus.idle)
-                              .toList()
-                              .isEmpty
+                      itemCount: (_serviceRequestStore.serviceRequestList
+                                  .where((element) =>
+                                      element.serviceRequestStatus ==
+                                      ServiceRequestStatus.idle)
+                                  .toList()
+                                  .isEmpty &&
+                              _serviceRequestStore.serviceRequestList
+                                  .where((element) =>
+                                      element.serviceRequestStatus ==
+                                      ServiceRequestStatus.inprogress)
+                                  .toList()
+                                  .isEmpty &&
+                              _serviceRequestStore.serviceRequestList
+                                  .where((element) =>
+                                      element.serviceRequestStatus ==
+                                      ServiceRequestStatus.accepted)
+                                  .toList()
+                                  .isEmpty)
                           ? 1
                           : _serviceRequestStore.serviceRequestList.length,
                       itemBuilder: (BuildContext context, int index) {
-                        if (_serviceRequestStore.serviceRequestList
+                        bool isNotIdle = _serviceRequestStore.serviceRequestList
                             .where((element) =>
                                 element.serviceRequestStatus ==
                                 ServiceRequestStatus.idle)
                             .toList()
-                            .isEmpty) {
+                            .isEmpty;
+                        bool isNotInProgress = _serviceRequestStore
+                            .serviceRequestList
+                            .where((element) =>
+                                element.serviceRequestStatus ==
+                                ServiceRequestStatus.inprogress)
+                            .toList()
+                            .isEmpty;
+                        bool isNotAccepted = _serviceRequestStore
+                            .serviceRequestList
+                            .where((element) =>
+                                element.serviceRequestStatus ==
+                                ServiceRequestStatus.accepted)
+                            .toList()
+                            .isEmpty;
+
+                        if (isNotIdle && isNotInProgress && isNotAccepted) {
                           return const Center(
                             child: Text('No Record Found'),
                           );
@@ -77,7 +105,11 @@ class _ServiceRequestListScreenState extends State<ServiceRequestListScreen> {
                           final ServiceRequest currentItem =
                               _serviceRequestStore.serviceRequestList[index];
                           return currentItem.serviceRequestStatus !=
-                                  ServiceRequestStatus.idle
+                                      ServiceRequestStatus.idle &&
+                                  currentItem.serviceRequestStatus !=
+                                      ServiceRequestStatus.inprogress &&
+                                  currentItem.serviceRequestStatus !=
+                                      ServiceRequestStatus.accepted
                               ? const SizedBox()
                               : InkWell(
                                   onTap: () {
@@ -101,17 +133,26 @@ class _ServiceRequestListScreenState extends State<ServiceRequestListScreen> {
                                     subtitle: Text(currentItem
                                         .vehicleService.serviceType
                                         .getName()),
-                                    trailing: IconButton(
-                                        onPressed: () async {
-                                          await _googleMapsHelper.openMap(
-                                              currentItem.userLocation.latitude,
-                                              currentItem
-                                                  .userLocation.longitude);
-                                        },
-                                        icon: Icon(
-                                          Icons.location_on,
-                                          color: theme.colorScheme.primary,
-                                        )),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(currentItem.serviceRequestStatus
+                                            .getName()),
+                                        const SizedBox(width: 20),
+                                        IconButton(
+                                            onPressed: () async {
+                                              await _googleMapsHelper.openMap(
+                                                  currentItem
+                                                      .userLocation.latitude,
+                                                  currentItem
+                                                      .userLocation.longitude);
+                                            },
+                                            icon: Icon(
+                                              Icons.location_on,
+                                              color: theme.colorScheme.primary,
+                                            )),
+                                      ],
+                                    ),
                                   )),
                                 );
                         }

@@ -24,6 +24,7 @@ abstract class _HomeScreenStore with Store {
     id: '',
     name: '',
     email: '',
+    cnic: '',
     password: '',
     address: '',
     phone: '',

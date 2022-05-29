@@ -25,6 +25,7 @@ class SignupScreen extends StatelessWidget {
 
   //Form
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController locationController = TextEditingController();
 
   //Custom Utils
   final CustomValidator _customValidator = getIt<CustomValidator>();
@@ -64,10 +65,14 @@ class SignupScreen extends StatelessWidget {
 
       if (fResponse.success) {
         final LatLng? newLocation = await Navigator.of(context)
-            .pushNamed(GetLocationScreen.routeName) as LatLng;
+            .pushNamed(GetLocationScreen.routeName, arguments: {
+          'startLocation': _authStore.newServiceShop.shopLocation
+        }) as LatLng;
         print('recieved : $newLocation');
         if (newLocation != null) {
           _authStore.updateLocation(newLocation);
+          locationController.text =
+              '${_authStore.newServiceShop.shopLocation.latitude.toStringAsFixed(5)},  ${_authStore.newServiceShop.shopLocation.longitude.toStringAsFixed(5)}';
           print('updated location');
           fResponse.passed(message: 'Location Updated');
         }
@@ -230,11 +235,13 @@ class SignupScreen extends StatelessWidget {
                                   const SizedBox(height: 20),
                                   TextFormField(
                                     validator: _customValidator.pakCnic,
+                                    maxLength: 13,
+                                    //todo : incorporate formatter
                                     onSaved: (String? val) {
                                       if (val == null) {
                                         return;
                                       }
-                                      _authStore.updateName(val);
+                                      _authStore.updateCnic(val);
                                     },
                                     keyboardType: TextInputType.text,
                                     decoration: const InputDecoration(
@@ -311,13 +318,11 @@ class SignupScreen extends StatelessWidget {
 
                                   Observer(builder: (_) {
                                     print(
-                                        _authStore.newServiceShop.shopLocation);
-                                    return TextFormField(
+                                        ' observer recieved location :${_authStore.newServiceShop.shopLocation}');
+                                    return TextField(
                                       readOnly: true,
-                                      validator:
-                                          _customValidator.nonNullableString,
-                                      initialValue:
-                                          ' ${_authStore.newServiceShop.shopLocation.latitude.toStringAsFixed(5)} ${_authStore.newServiceShop.shopLocation.longitude.toStringAsFixed(5)} ',
+                                      controller: locationController,
+                                      // ' ${_authStore.newServiceShop.shopLocation.latitude.toStringAsFixed(5)} ${_authStore.newServiceShop.shopLocation.longitude.toStringAsFixed(5)} ',
                                       decoration: InputDecoration(
                                           label: const Text('Location'),
                                           prefixIcon:

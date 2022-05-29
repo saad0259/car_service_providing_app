@@ -105,9 +105,10 @@ class CustomValidator {
       return "Cnic is Required";
     } else if (value.length != limit) {
       return "Cnic number must $limit digits";
-    } else if (!regExp.hasMatch(value)) {
-      return "Please Enter the right format";
     }
+    //  else if (!regExp.hasMatch(value)) {
+    //   return "Please enter the right format";
+    // }
     return null;
   }
 

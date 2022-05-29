@@ -24,14 +24,17 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
 
   //Functions
   Future<void> updateRequestStatus(
-      BuildContext context, String serviceRequestId) async {
+      BuildContext context,
+      String serviceRequestId,
+      ServiceRequestStatus serviceRequestStatus) async {
     FunctionResponse fResponse = getIt<FunctionResponse>();
 
     _customAlerts.showLoaderDialog(context);
     fResponse = await _connectivityHelper.checkInternetConnection();
     if (fResponse.success) {
       fResponse = await _serviceRequestStore.updateRequsetStatus(
-          serviceRequestId, ServiceRequestStatus.completed);
+          serviceRequestId, serviceRequestStatus);
+
       _serviceRequestStore.loadAllServiceRequests();
     }
     _customAlerts.popLoader(context);
@@ -96,13 +99,46 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
                     Expanded(
                       child: ElevatedButton(
                         onPressed: () async {
-                          await updateRequestStatus(context, serviceRequest.id);
+                          ServiceRequestStatus? nextStatus;
+
+                          if (serviceRequest.serviceRequestStatus ==
+                              ServiceRequestStatus.idle) {
+                            nextStatus = ServiceRequestStatus.accepted;
+                          } else if (serviceRequest.serviceRequestStatus ==
+                              ServiceRequestStatus.accepted) {
+                            nextStatus = ServiceRequestStatus.inprogress;
+                          } else if (serviceRequest.serviceRequestStatus ==
+                              ServiceRequestStatus.inprogress) {
+                            nextStatus = ServiceRequestStatus.completed;
+                          }
+
+                          assert(nextStatus != null);
+                          await updateRequestStatus(
+                              context, serviceRequest.id, nextStatus!);
                         },
-                        child: const Text('Mark Completed'),
+                        child: Text(serviceRequest.serviceRequestStatus
+                            .getButtonTextName()),
                       ),
                     ),
                   ],
-                )
+                ),
+                const SizedBox(height: 20),
+                serviceRequest.serviceRequestStatus == ServiceRequestStatus.idle
+                    ? Row(
+                        children: [
+                          Expanded(
+                              child: TextButton(
+                            onPressed: () async {
+                              await updateRequestStatus(
+                                  context,
+                                  serviceRequest.id,
+                                  ServiceRequestStatus.canceled);
+                            },
+                            child: Text('Cancel'),
+                          ))
+                        ],
+                      )
+                    : const SizedBox(),
               ],
             ),
           ),

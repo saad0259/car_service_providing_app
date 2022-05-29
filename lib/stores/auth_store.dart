@@ -94,6 +94,7 @@ abstract class _AuthStore with Store {
       rating: newServiceShop.rating,
       shopLocation: location,
     );
+    print('store updated location : $location');
   }
 
   @action
@@ -168,6 +169,24 @@ abstract class _AuthStore with Store {
     );
   }
 
+  @action
+  void updateAddress(String newAddress) {
+    newServiceShop = ServiceShop(
+      id: newServiceShop.id,
+      name: newServiceShop.name,
+      cnic: newServiceShop.cnic,
+      email: newServiceShop.email,
+      password: newServiceShop.password,
+      address: newAddress,
+      phone: newServiceShop.phone,
+      openingTime: newServiceShop.openingTime,
+      closingTime: newServiceShop.closingTime,
+      coverImage: newServiceShop.coverImage,
+      rating: newServiceShop.rating,
+      shopLocation: newServiceShop.shopLocation,
+    );
+  }
+
   void resetSignupForm() {
     newServiceShop = ServiceShop(
       id: '',
@@ -189,30 +208,40 @@ abstract class _AuthStore with Store {
     FunctionResponse fResponse = getIt<FunctionResponse>();
 
     try {
-      final UserCredential _authResult =
-          await firebaseAuth.createUserWithEmailAndPassword(
-              email: newServiceShop.email, password: newServiceShop.password);
-      if (_authResult.user != null) {
-        fResponse = await _customImageHelper.uploadPicture(
-            (newServiceShop.coverImage), serviceShopImagesDirectory);
-        if (fResponse.success) {
-          updateCoverImage(fResponse.data);
+      fResponse = await checkIsCnicDuplicated(newServiceShop.cnic);
+      fResponse.printResponse();
+      if (fResponse.success && !fResponse.data) {
+        final UserCredential _authResult =
+            await firebaseAuth.createUserWithEmailAndPassword(
+                email: newServiceShop.email, password: newServiceShop.password);
+        if (_authResult.user != null) {
+          fResponse = await _customImageHelper.uploadPicture(
+              (newServiceShop.coverImage), serviceShopImagesDirectory);
+          if (fResponse.success) {
+            updateCoverImage(fResponse.data);
 
-          await firestoreShopsCollection.doc(_authResult.user!.uid).set({
-            'name': newServiceShop.name,
-            'email': newServiceShop.email,
-            'password': newServiceShop.password,
-            'coverImage': newServiceShop.coverImage,
-            'rating': newServiceShop.rating,
-            'address': newServiceShop.address,
-            'phone': newServiceShop.phone,
-            'shopLocation': GeoPoint(newServiceShop.shopLocation.latitude,
-                newServiceShop.shopLocation.longitude),
-          });
-          fResponse.passed(message: 'Signup Successfull');
+            await firestoreShopsCollection.doc(_authResult.user!.uid).set({
+              'name': newServiceShop.name,
+              'email': newServiceShop.email,
+              'password': newServiceShop.password,
+              'coverImage': newServiceShop.coverImage,
+              'rating': newServiceShop.rating,
+              'cnic': newServiceShop.cnic,
+              'address': newServiceShop.address,
+              'phone': newServiceShop.phone,
+              'shopLocation': GeoPoint(newServiceShop.shopLocation.latitude,
+                  newServiceShop.shopLocation.longitude),
+            });
+            fResponse.passed(message: 'Signup Successfull');
+          }
+        } else {
+          fResponse.failed(message: 'Error Signing Up');
         }
       } else {
-        fResponse.failed(message: 'Error Signing Up');
+        fResponse.failed(
+            message: fResponse.data == null
+                ? 'Cnic check failed'
+                : 'Cnic Already Exists');
       }
     } catch (e) {
       fResponse.failed(message: 'Error signing up : $e');
@@ -238,6 +267,23 @@ abstract class _AuthStore with Store {
       fResponse.failed(message: 'Error logging in : $e');
     }
 
+    return fResponse;
+  }
+
+  Future<FunctionResponse> checkIsCnicDuplicated(String cnic) async {
+    FunctionResponse fResponse = getIt<FunctionResponse>();
+    try {
+      final QuerySnapshot? data =
+          await firestoreShopsCollection.where('cnic', isEqualTo: cnic).get();
+      if (data != null && data.docs.isNotEmpty) {
+        fResponse.data = true;
+      } else {
+        fResponse.data = false;
+      }
+      fResponse.passed(message: 'cnic check successfull : ${fResponse.data}');
+    } catch (e) {
+      fResponse.failed(message: 'Error during checkCnicDuplication  : e');
+    }
     return fResponse;
   }
 }
