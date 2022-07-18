@@ -1,4 +1,5 @@
 import 'package:car_service_providing_app/models/vehicle_service.dart';
+import 'package:car_service_providing_app/repo/shop_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,6 +7,8 @@ import '../../custom_utils/connectivity_helper.dart';
 import '../../custom_utils/custom_alerts.dart';
 import '../../custom_utils/function_response.dart';
 import '../../custom_utils/google_maps_helper.dart';
+import '../../models/review_model.dart';
+import '../../repo/review_repo.dart';
 import '../../resources/app_images.dart';
 import '../../custom_widgets/custom_wrappers.dart';
 import '../../service_locator.dart';
@@ -29,9 +32,9 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   //UI variables
-  final double rating = 4.5;
+  double rating = 0.0;
 
-  final int reviewsCount = 703;
+  int reviewsCount = 0;
 
   //Stores
   final ManageServiceStore _manageServiceStore = getIt<ManageServiceStore>();
@@ -183,23 +186,75 @@ class _HomeScreenState extends State<HomeScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          _profileStore.currentUser.rating
-                                              .toString(),
-                                          style: theme.textTheme.headline6,
-                                        ),
+                                        FutureBuilder<List<ReviewModel>>(
+                                            future:
+                                                ReviewRepo.instane.getReviews(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasError ||
+                                                  !snapshot.hasData ||
+                                                  snapshot.data == null ||
+                                                  snapshot.data!.isEmpty) {
+                                                rating = 0.0;
+                                              } else {
+                                                snapshot.data!
+                                                    .forEach((element) {
+                                                  rating += element.rating;
+                                                });
+                                                rating = rating /
+                                                    snapshot.data!.length;
+                                              }
+
+                                              return Text(
+                                                rating.toStringAsFixed(2),
+                                                style:
+                                                    theme.textTheme.headline6,
+                                              );
+                                            }),
                                         const SizedBox(width: 10.0),
                                         const Icon(Icons.star),
                                         const SizedBox(width: 10.0),
-                                        Text(
-                                          '($reviewsCount Reviews)',
-                                          style: theme.textTheme.headline6,
-                                        ),
+                                        FutureBuilder<List<ReviewModel>>(
+                                            future:
+                                                ReviewRepo.instane.getReviews(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasError ||
+                                                  !snapshot.hasData ||
+                                                  snapshot.data == null) {
+                                                // return Text('0',
+                                                //     style: theme
+                                                //         .textTheme.headline6);
+                                                reviewsCount = 0;
+                                              } else {
+                                                reviewsCount =
+                                                    snapshot.data!.length;
+                                              }
+
+                                              return Text(
+                                                '($reviewsCount Reviews)',
+                                                style:
+                                                    theme.textTheme.headline6,
+                                              );
+                                            }),
                                       ],
                                     ),
                                   ),
                                 ),
                               ],
+                            ),
+                            const SizedBox(height: 20),
+                            FutureBuilder(
+                              future: ShopRepo.instance.getTotalEarning(),
+                              initialData: 0,
+                              builder: (BuildContext context,
+                                  AsyncSnapshot snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Error');
+                                }
+                                return Text(
+                                  'Total Earning: ${snapshot.data}',
+                                  style: theme.textTheme.headline6,
+                                );
+                              },
                             ),
                             const SizedBox(height: 20),
                             BookingStats(
@@ -288,46 +343,46 @@ class _BookingStatsState extends State<BookingStats> {
                       );
               }),
             ),
-            Expanded(
-              child: Center(
-                child: InkWell(
-                  // onTap: () =>
-                  //     Navigator.of(context).pushNamed(BookingsScreen.routeName),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Observer(builder: (_) {
-                      //   // return Text(
-                      //   //   bookServiceStore.serviceRequestList.length.toString(),
-                      //   //   style: theme.textTheme.headline4,
-                      //   // );
-                      // }),
-                      Text(
-                        'Reviews',
-                        style: widget.theme.textTheme.headline5,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Text(
-                    //   homeScreenStore.messages.toString(),
-                    //   style: theme.textTheme.headline4,
-                    // ),
-                    Text(
-                      'Messages',
-                      style: widget.theme.textTheme.headline5,
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            // Expanded(
+            //   child: Center(
+            //     child: InkWell(
+            //       // onTap: () =>
+            //       //     Navigator.of(context).pushNamed(BookingsScreen.routeName),
+            //       child: Column(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           // Observer(builder: (_) {
+            //           //   // return Text(
+            //           //   //   bookServiceStore.serviceRequestList.length.toString(),
+            //           //   //   style: theme.textTheme.headline4,
+            //           //   // );
+            //           // }),
+            //           // Text(
+            //           //   'Reviews',
+            //           //   style: widget.theme.textTheme.headline5,
+            //           // ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Expanded(
+            //   child: Center(
+            //     child: Column(
+            //       mainAxisAlignment: MainAxisAlignment.center,
+            //       children: [
+            //         // Text(
+            //         //   homeScreenStore.messages.toString(),
+            //         //   style: theme.textTheme.headline4,
+            //         // ),
+            //         Text(
+            //           'Messages',
+            //           style: widget.theme.textTheme.headline5,
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
           ],
         ));
   }

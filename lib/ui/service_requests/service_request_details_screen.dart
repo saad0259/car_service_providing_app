@@ -94,17 +94,17 @@ class ServiceRequestDetailsScreen extends StatelessWidget {
                           serviceRequest.vehicleService.cost.toString()),
                       _customListItem(theme, 'Status',
                           serviceRequest.serviceRequestStatus.getName()),
-                      _customIconListItem(
-                          theme,
-                          'User Location',
-                          InkWell(
-                            onTap: () async {
-                              await _googleMapsHelper.openMap(
-                                  serviceRequest.userLocation.latitude,
-                                  serviceRequest.userLocation.longitude);
-                            },
-                            child: const Icon(Icons.location_on),
-                          ))
+                      // _customIconListItem(
+                      //     theme,
+                      //     'User Location',
+                      //     InkWell(
+                      //       onTap: () async {
+                      //         await _googleMapsHelper.openMap(
+                      //             serviceRequest.userLocation.latitude,
+                      //             serviceRequest.userLocation.longitude);
+                      //       },
+                      //       child: const Icon(Icons.location_on),
+                      //     ))
                     ],
                   ),
                 ),

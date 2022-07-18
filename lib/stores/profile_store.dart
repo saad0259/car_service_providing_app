@@ -11,6 +11,7 @@ import '../custom_utils/function_response.dart';
 import '../custom_utils/google_maps_helper.dart';
 import '../custom_utils/image_helper.dart';
 import '../models/service_shop.dart';
+import '../repo/service_repo.dart';
 import '../resources/app_images.dart';
 import '../service_locator.dart';
 import 'auth_store.dart';
@@ -135,6 +136,9 @@ abstract class _ProfileStore with Store {
             'shopLocation': GeoPoint(currentUser.shopLocation.latitude,
                 currentUser.shopLocation.longitude),
           });
+          ServiceRepo.instance.updateShopLocation(GeoPoint(
+              currentUser.shopLocation.latitude,
+              currentUser.shopLocation.longitude));
           DocumentReference services =
               await firestoreOrdersCollection.doc('shopId');
           batch.update(services, {

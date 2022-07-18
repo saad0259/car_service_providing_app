@@ -1,4 +1,6 @@
+import 'dart:developer';
 import 'dart:io';
+import 'dart:math' as math;
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../../theme/my_app_colors.dart';
@@ -35,6 +37,12 @@ Widget customCard({
   );
 }
 
+String generateRandomString(int len) {
+  var r = math.Random();
+  return String.fromCharCodes(
+      List.generate(len, (index) => r.nextInt(33) + 89));
+}
+
 Widget customImageBox(double width, ThemeData theme,
     {required String image,
     Key? key,
@@ -45,9 +53,9 @@ Widget customImageBox(double width, ThemeData theme,
   ImageType imageType = _customImageHelper.getImageType(image);
   double imageHeight = 200;
   const BoxFit customFit = BoxFit.cover;
-
+  log(key.toString());
   return InkWell(
-    key: key,
+    key: ValueKey(generateRandomString(10)),
     onTap: onTap,
     child: customCard(
       child: Column(

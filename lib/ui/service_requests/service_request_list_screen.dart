@@ -1,3 +1,5 @@
+import 'package:car_service_providing_app/repo/user_repo.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 
@@ -139,18 +141,43 @@ class _ServiceRequestListScreenState extends State<ServiceRequestListScreen> {
                                         Text(currentItem.serviceRequestStatus
                                             .getName()),
                                         const SizedBox(width: 20),
-                                        IconButton(
-                                            onPressed: () async {
-                                              await _googleMapsHelper.openMap(
-                                                  currentItem
-                                                      .userLocation.latitude,
-                                                  currentItem
-                                                      .userLocation.longitude);
-                                            },
-                                            icon: Icon(
-                                              Icons.location_on,
-                                              color: theme.colorScheme.primary,
-                                            )),
+                                        FutureBuilder<GeoPoint>(
+                                            future: UserRepo.instance
+                                                .getUserLatLng(
+                                                    currentItem.userId),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                return IconButton(
+                                                  icon: const Icon(
+                                                      Icons.directions),
+                                                  onPressed: () {
+                                                    _googleMapsHelper.openMap(
+                                                      snapshot.data!.latitude,
+                                                      snapshot.data!.longitude,
+                                                    );
+                                                  },
+                                                );
+                                              } else {
+                                                return const SizedBox();
+                                              }
+
+                                              // return IconButton(
+                                              //     onPressed: () async {
+                                              //       await _googleMapsHelper
+                                              //           .openMap(
+                                              //               currentItem
+                                              //                   .userLocation
+                                              //                   .latitude,
+                                              //               currentItem
+                                              //                   .userLocation
+                                              //                   .longitude);
+                                              //     },
+                                              //     icon: Icon(
+                                              //       Icons.location_on,
+                                              //       color: theme
+                                              //           .colorScheme.primary,
+                                              //     ));
+                                            }),
                                       ],
                                     ),
                                   )),
